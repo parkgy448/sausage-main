@@ -2,9 +2,10 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>환전신청 - SSS CASINO</title>
+  <title>충전신청 - SSS CASINO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
+    * { box-sizing: border-box; margin:0; padding:0; }
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -14,6 +15,9 @@
       display: flex;
       flex-direction: column;
     }
+    a { color: inherit; text-decoration: none; }
+
+    /* 상단바 - 메인과 비슷하게 */
     header {
       padding: 10px 16px;
       background: #050814;
@@ -23,69 +27,223 @@
       align-items: center;
       font-size: 14px;
     }
+    .header-left {
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .logo-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      background: radial-gradient(circle at 20% 20%, #facc15, #ea580c);
+    }
+    .header-title-main {
+      font-weight: 700;
+    }
+    .header-sub {
+      font-size: 12px;
+      color:#e5e7eb;
+    }
+    .header-right {
+      font-size: 12px;
+      text-align:right;
+    }
+
     main {
       flex: 1;
-      padding: 16px;
+      padding: 16px 8px 72px;
       max-width: 640px;
-      margin: 0 auto 60px;
+      margin: 0 auto;
       width: 100%;
     }
-    h1 { font-size: 18px; margin-bottom: 12px; }
+
+    /* 카드 스타일 폼 */
+    .form-card {
+      border-radius: 18px;
+      padding: 16px 14px 18px;
+      background: radial-gradient(circle at 20% 0, #4c1d95, #020617 60%);
+      box-shadow: 0 18px 40px rgba(15,23,42,0.9);
+      margin-bottom: 18px;
+    }
+    .form-card h1 {
+      font-size: 18px;
+      margin-bottom: 6px;
+    }
+    .form-card p.desc {
+      font-size: 12px;
+      color:#e5e7eb;
+      margin-bottom: 12px;
+    }
     .field { margin-bottom: 12px; }
     .field label { display:block; font-size: 13px; margin-bottom:4px; }
     .field input {
       width: 100%; padding: 8px 10px; border-radius: 10px;
       border: 1px solid #4b5563; background: #020617; color:#f9fafb;
+      font-size:13px;
     }
     .primary-btn {
       width: 100%; padding: 10px; border-radius: 999px;
       border:none; cursor:pointer;
-      background: linear-gradient(90deg,#38bdf8,#0ea5e9);
+      background: linear-gradient(90deg,#f97316,#ec4899);  /* 메인 테마 */
       color:#0f172a; font-weight:600;
       margin-top:4px;
     }
     .error-text { font-size: 12px; color:#f97373; min-height:14px; margin-top:4px;}
-    table { width:100%; border-collapse: collapse; margin-top:18px; font-size:12px;}
+
+    h2 {
+      font-size:15px;
+      margin-top:22px;
+      margin-bottom:6px;
+    }
+    table { width:100%; border-collapse: collapse; margin-top:4px; font-size:12px;}
     th, td { border-bottom:1px solid rgba(148,163,184,.3); padding:6px 4px; text-align:left;}
-    nav.bottom-nav {
+
+    /* 하단 네비 - index와 동일 스타일 */
+    .bottom-nav {
       position:fixed; bottom:0; left:0; right:0;
       max-width:640px; margin:0 auto;
       display:flex; background:#020617; border-top:1px solid rgba(148,163,184,.3);
       font-size:11px; color:#9ca3af;
+      z-index:40;
     }
-    nav .bottom-item { flex:1; text-align:center; padding:8px 0 6px; text-decoration:none; color:inherit;}
-    nav .bottom-item span { display:block; font-size:18px; margin-bottom:2px;}
-    nav .active { color:#38bdf8; }
+    .bottom-item {
+      flex:1;
+      padding:4px 0 2px;
+      text-align:center;
+      font-size:11px;
+      color:#9ca3af;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      background:none;
+      border:none;
+      cursor:pointer;
+    }
+    a.bottom-item { text-decoration:none; }
+    .bottom-icon { display:flex; align-items:center; justify-content:center; }
+    .bottom-icon svg { width:22px; height:22px; display:block; }
+    .bottom-label { margin-top:1px; line-height:1.2; }
+    .bottom-item.active { color:#f97316; }
+
+    /* 전체메뉴 사이드 드로어 */
+    .side-menu-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.75);
+      display: flex;
+      align-items: stretch;
+      justify-content: flex-start;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease-out;
+      z-index: 60;
+    }
+    .side-menu-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .side-menu-panel {
+      width: 280px;
+      max-width: 80%;
+      background: #050814;
+      padding: 16px 18px;
+      transform: translateX(-100%);
+      transition: transform 0.18s ease-out;
+      display: flex;
+      flex-direction: column;
+    }
+    .side-menu-backdrop.open .side-menu-panel {
+      transform: translateX(0);
+    }
+    .side-menu-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .side-menu-header-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .side-menu-logo-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 20% 20%, #facc15, #ea580c);
+    }
+    .side-menu-title-text {
+      font-size: 14px;
+      color: #e5e7eb;
+    }
+    .side-menu-close {
+      background: none;
+      border: none;
+      color: #e5e7eb;
+      font-size: 22px;
+      cursor: pointer;
+    }
+    .side-menu-caption {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-bottom: 18px;
+    }
+    .side-menu-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 15px;
+    }
+    .side-menu-list li + li {
+      margin-top: 14px;
+    }
+    .side-menu-list a {
+      color: #f9fafb;
+      text-decoration: none;
+    }
+    .side-menu-list a:hover {
+      color: #f97316;
+    }
   </style>
 </head>
 <body>
   <header>
-    <div>환전신청</div>
-    <div id="userLabel" style="font-size:12px;">로그인 필요</div>
+    <div class="header-left">
+      <div class="logo-icon"></div>
+      <div>
+        <div class="header-title-main">충전신청</div>
+        <div class="header-sub">입금 후 충전 신청을 해주세요</div>
+      </div>
+    </div>
+    <div class="header-right" id="userLabel">로그인 필요</div>
   </header>
 
   <main>
-    <h1>환전신청</h1>
-    <p style="font-size:12px;color:#e5e7eb;margin-bottom:10px;">
-      환전 신청을 하면 관리자가 확인 후 출금 처리합니다.
-    </p>
+    <section class="form-card">
+      <h1>충전신청</h1>
+      <p class="desc">
+        입금 후 충전 신청을 하면, 관리자가 확인 후 승인해 머니로 반영합니다.
+      </p>
 
-    <div class="field">
-      <label for="amountInput">금액 (원)</label>
-      <input id="amountInput" type="number" min="10000" step="1000" />
-    </div>
-    <div class="field">
-      <label for="bankName">출금은행</label>
-      <input id="bankName" type="text" placeholder="예: 국민은행" />
-    </div>
-    <div class="field">
-      <label for="accountName">예금주</label>
-      <input id="accountName" type="text" />
-    </div>
-    <div class="error-text" id="errorText"></div>
-    <button class="primary-btn" id="submitBtn">환전신청하기</button>
+      <div class="field">
+        <label for="amountInput">금액 (원)</label>
+        <input id="amountInput" type="number" min="10000" step="1000" />
+      </div>
+      <div class="field">
+        <label for="bankName">입금은행</label>
+        <input id="bankName" type="text" placeholder="예: 국민은행" />
+      </div>
+      <div class="field">
+        <label for="senderName">입금자명</label>
+        <input id="senderName" type="text" />
+      </div>
+      <div class="error-text" id="errorText"></div>
+      <button class="primary-btn" id="submitBtn">충전신청하기</button>
+    </section>
 
-    <h2 style="font-size:15px;margin-top:22px;">나의 환전 내역</h2>
+    <h2>나의 충전 내역</h2>
     <table>
       <thead>
         <tr>
@@ -100,24 +258,86 @@
     </table>
   </main>
 
+  <!-- 하단 네비게이션: index와 동일 아이콘/구조 -->
   <nav class="bottom-nav">
     <a href="index.html" class="bottom-item">
-      <span>🏠</span>홈
+      <div class="bottom-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 10.5 12 4l8 6.5"></path>
+          <path d="M6 10v8.5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V10"></path>
+        </svg>
+      </div>
+      <div class="bottom-label">홈</div>
     </a>
-    <a href="deposit.html" class="bottom-item">
-      <span>💰</span>충전신청
+    <a href="deposit.html" class="bottom-item active">
+      <div class="bottom-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <ellipse cx="12" cy="7" rx="7" ry="3.5"></ellipse>
+          <path d="M5 7v5c0 1.9 3.1 3.5 7 3.5s7-1.6 7-3.5V7"></path>
+          <path d="M5 12v3.5C5 17.4 8.1 19 12 19s7-1.6 7-3.5V12"></path>
+        </svg>
+      </div>
+      <div class="bottom-label">충전신청</div>
     </a>
-    <a href="roulette.html" class="bottom-item">
-      <span>☰</span>전체메뉴
-    </a>
-    <a href="exchange.html" class="bottom-item active">
-      <span>💵</span>환전신청
+    <button type="button" class="bottom-item" id="openDrawerBtn">
+      <div class="bottom-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M4 7h16"></path>
+          <path d="M4 12h16"></path>
+          <path d="M4 17h16"></path>
+        </svg>
+      </div>
+      <div class="bottom-label">전체메뉴</div>
+    </button>
+    <a href="exchange.html" class="bottom-item">
+      <div class="bottom-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="7" width="18" height="10" rx="2"></rect>
+          <path d="M8 12h5"></path>
+          <path d="M13 10 15 12l-2 2"></path>
+        </svg>
+      </div>
+      <div class="bottom-label">환전신청</div>
     </a>
     <a href="messages.html" class="bottom-item">
-      <span>✉️</span>쪽지
+      <div class="bottom-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3.2" y="6" width="17.6" height="12" rx="1.8"></rect>
+          <path d="M4.5 7.5 12 12.5l7.5-5"></path>
+        </svg>
+      </div>
+      <div class="bottom-label">쪽지</div>
     </a>
   </nav>
 
+  <!-- 전체메뉴 사이드 드로어 -->
+  <div id="sideMenuBackdrop" class="side-menu-backdrop">
+    <div class="side-menu-panel">
+      <div class="side-menu-header">
+        <div class="side-menu-header-logo">
+          <div class="side-menu-logo-icon"></div>
+          <div>
+            <div>SSS CASINO</div>
+            <div class="side-menu-title-text">전체메뉴</div>
+          </div>
+        </div>
+        <button id="sideMenuClose" class="side-menu-close">&times;</button>
+      </div>
+      <div class="side-menu-caption">원하는 메뉴를 선택하세요.</div>
+      <ul class="side-menu-list">
+        <li><a href="index.html">라이브카지노</a></li>
+        <li><a href="roulette.html">슬롯게임</a></li>
+        <li><a href="deposit.html">충전신청</a></li>
+        <li><a href="exchange.html">환전신청</a></li>
+        <li><a href="transfer.html">포인트 전환</a></li>
+        <li><a href="notice.html">공지사항</a></li>
+        <li><a href="event.html">이벤트</a></li>
+        <li><a href="cs.html">고객센터</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Firestore 로직 (기존 코드 유지) -->
   <script type="module">
     import { db } from "./js/firebase-config.js";
     import {
@@ -137,7 +357,7 @@
     const userLabel = document.getElementById("userLabel");
     const amountInput = document.getElementById("amountInput");
     const bankName = document.getElementById("bankName");
-    const accountName = document.getElementById("accountName");
+    const senderName = document.getElementById("senderName");
     const errorText = document.getElementById("errorText");
     const submitBtn = document.getElementById("submitBtn");
     const historyBody = document.getElementById("historyBody");
@@ -155,7 +375,7 @@
       userLabel.textContent = (profile?.nickname || user.email) + "님";
 
       const q = query(
-        collection(db, "withdrawals"),
+        collection(db, "deposits"),
         where("userId", "==", user.uid),
         orderBy("createdAt", "desc")
       );
@@ -192,29 +412,51 @@
         errorText.textContent = "최소 10,000원 이상 입력해주세요.";
         return;
       }
-      if (!bankName.value.trim() || !accountName.value.trim()) {
-        errorText.textContent = "은행과 예금주를 입력해주세요.";
+      if (!bankName.value.trim() || !senderName.value.trim()) {
+        errorText.textContent = "은행과 입금자명을 입력해주세요.";
         return;
       }
 
       try {
-        await addDoc(collection(db, "withdrawals"), {
+        await addDoc(collection(db, "deposits"), {
           userId: currentUser.uid,
           amount,
           bankName: bankName.value.trim(),
-          accountName: accountName.value.trim(),
+          senderName: senderName.value.trim(),
           status: "pending",
           createdAt: serverTimestamp()
         });
-        alert("환전 신청이 접수되었습니다.");
+        alert("충전 신청이 접수되었습니다.");
         amountInput.value = "";
         bankName.value = "";
-        accountName.value = "";
+        senderName.value = "";
       } catch (err) {
         console.error(err);
         errorText.textContent = "오류: " + err.message;
       }
     });
+  </script>
+
+  <!-- 사이드메뉴 동작 스크립트 (공통) -->
+  <script>
+    const sideMenuBackdrop = document.getElementById("sideMenuBackdrop");
+    const sideMenuClose = document.getElementById("sideMenuClose");
+    const openDrawerBtn = document.getElementById("openDrawerBtn");
+
+    function openSideMenu() {
+      sideMenuBackdrop.classList.add("open");
+    }
+    function closeSideMenu() {
+      sideMenuBackdrop.classList.remove("open");
+    }
+
+    if (openDrawerBtn && sideMenuBackdrop && sideMenuClose) {
+      openDrawerBtn.addEventListener("click", openSideMenu);
+      sideMenuClose.addEventListener("click", closeSideMenu);
+      sideMenuBackdrop.addEventListener("click", (e) => {
+        if (e.target === sideMenuBackdrop) closeSideMenu();
+      });
+    }
   </script>
 </body>
 </html>
