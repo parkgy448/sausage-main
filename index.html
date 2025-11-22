@@ -319,6 +319,26 @@
       min-height: 14px;
     }
 
+    .password-field {
+      position: relative;
+    }
+    .password-field input {
+      padding-right: 40px; /* 아이콘을 위한 공간 확보 */
+    }
+    .password-toggle {
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+      cursor: pointer;
+      user-select: none;
+      width: 20px;
+      height: 20px;
+    }
+    .password-toggle svg {
+      fill: white;
+    }
+
     /* 전체메뉴 사이드 드로어 */
     .side-menu-backdrop {
       position: fixed;
@@ -586,7 +606,7 @@
         </div>
         <div class="field">
           <label for="loginPassword">비밀번호</label>
-          <input id="loginPassword" type="password" autocomplete="current-password" />
+          <input id="loginPassword" type="password" autocomplete="current-password" placeholder="비밀번호 입력" />
         </div>
         <div class="error-text" id="loginError"></div>
         <button class="primary-btn" id="loginSubmit">로그인</button>
@@ -595,20 +615,36 @@
 
       <div id="registerFormContainer" style="display:none;">
         <div class="field">
-          <label for="regEmail">아이디 또는 이메일</label>
-          <input id="regEmail" type="text" autocomplete="username" placeholder="아이디 또는 이메일" />
-        </div>
-        <div class="field">
-          <label for="regPassword">비밀번호</label>
-          <input id="regPassword" type="password" autocomplete="new-password" />
+          <label for="regId">아이디</label>
+          <input id="regId" type="text" placeholder="아이디" />
         </div>
         <div class="field">
           <label for="regNickname">닉네임</label>
-          <input id="regNickname" type="text" />
+          <input id="regNickname" type="text" placeholder="닉네임" />
+        </div>
+        <div class="field password-field">
+          <label for="regPassword">비밀번호</label>
+          <input id="regPassword" type="password" autocomplete="new-password" placeholder="비밀번호 입력" />
         </div>
         <div class="field">
-          <label for="regPhone">연락처 (선택)</label>
-          <input id="regPhone" type="tel" />
+          <label for="regBank">은행</label>
+          <input id="regBank" type="text" placeholder="은행" />
+        </div>
+        <div class="field">
+          <label for="regAccountNumber">계좌번호</label>
+          <input id="regAccountNumber" type="text" placeholder="계좌번호" />
+        </div>
+        <div class="field">
+          <label for="regAccountHolder">예금주</label>
+          <input id="regAccountHolder" type="text" placeholder="예금주" />
+        </div>
+        <div class="field password-field">
+          <label for="regWithdrawPassword">출금비번</label>
+          <input id="regWithdrawPassword" type="password" placeholder="비밀번호 입력" />
+        </div>
+        <div class="field">
+          <label for="regPhone">휴대폰 번호</label>
+          <input id="regPhone" type="tel" placeholder="휴대폰 번호" />
         </div>
         <div class="error-text" id="regError"></div>
         <button class="primary-btn" id="regSubmit">회원가입</button>
@@ -894,6 +930,25 @@
         console.error("message count error:", err);
         msgCountText.textContent = "0";
       }
+    });
+  </script>
+  <script>
+    document.querySelectorAll('.password-toggle').forEach(toggle => {
+      toggle.addEventListener('click', () => {
+        const passwordField = toggle.previousElementSibling;
+        const eyeOpen = toggle.querySelector('.eye-open');
+        const eyeClose = toggle.querySelector('.eye-close');
+
+        if (passwordField.type === 'password') {
+          passwordField.type = 'text';
+          eyeOpen.style.display = 'none';
+          eyeClose.style.display = 'block';
+        } else {
+          passwordField.type = 'password';
+          eyeOpen.style.display = 'block';
+          eyeClose.style.display = 'none';
+        }
+      });
     });
   </script>
 </body>
