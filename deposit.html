@@ -515,7 +515,7 @@
         </div>
         <div class="field">
           <label for="loginPassword">비밀번호</label>
-          <input id="loginPassword" type="password" autocomplete="current-password" />
+          <input id="loginPassword" type="password" autocomplete="current-password" placeholder="비밀번호 입력" />
         </div>
         <div class="error-text" id="loginError"></div>
         <button class="primary-btn" id="loginSubmit">로그인</button>
@@ -524,20 +524,36 @@
 
       <div id="registerFormContainer" style="display:none;">
         <div class="field">
-          <label for="regEmail">아이디 또는 이메일</label>
-          <input id="regEmail" type="text" autocomplete="username" placeholder="아이디 또는 이메일" />
-        </div>
-        <div class="field">
-          <label for="regPassword">비밀번호</label>
-          <input id="regPassword" type="password" autocomplete="new-password" />
+          <label for="regId">아이디</label>
+          <input id="regId" type="text" placeholder="아이디" />
         </div>
         <div class="field">
           <label for="regNickname">닉네임</label>
-          <input id="regNickname" type="text" />
+          <input id="regNickname" type="text" placeholder="닉네임" />
+        </div>
+        <div class="field password-field">
+          <label for="regPassword">비밀번호</label>
+          <input id="regPassword" type="password" autocomplete="new-password" placeholder="비밀번호 입력" />
         </div>
         <div class="field">
-          <label for="regPhone">연락처 (선택)</label>
-          <input id="regPhone" type="tel" />
+          <label for="regBank">은행</label>
+          <input id="regBank" type="text" placeholder="은행" />
+        </div>
+        <div class="field">
+          <label for="regAccountNumber">계좌번호</label>
+          <input id="regAccountNumber" type="text" placeholder="계좌번호" />
+        </div>
+        <div class="field">
+          <label for="regAccountHolder">예금주</label>
+          <input id="regAccountHolder" type="text" placeholder="예금주" />
+        </div>
+        <div class="field password-field">
+          <label for="regWithdrawPassword">출금비번</label>
+          <input id="regWithdrawPassword" type="password" placeholder="숫자 4자리" autocomplete="new-password" />
+        </div>
+        <div class="field">
+          <label for="regPhone">휴대폰 번호</label>
+          <input id="regPhone" type="tel" placeholder="휴대폰 번호" />
         </div>
         <div class="error-text" id="regError"></div>
         <button class="primary-btn" id="regSubmit">회원가입</button>
@@ -546,60 +562,79 @@
     </div>
   </div>
 
+  <!-- 메인 스크립트 -->
   <script type="module">
     import { auth, db } from "./js/firebase-config.js";
-    import { addDoc, collection, query, where, orderBy, onSnapshot, serverTimestamp, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-    import { listenAuth, logoutUser, fetchCurrentUserProfile, loginUser, registerUser, translateAuthError } from "./js/auth-utils.js";
+    import {
+      collection,
+      query,
+      where,
+      getDocs, doc, getDoc, serverTimestamp, addDoc, onSnapshot
+    } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+    import {
+      loginUser,
+      registerUser,
+      logoutUser,
+      listenAuth,
+      fetchCurrentUserProfile,
+      translateAuthError
+    } from "./js/auth-utils.js";
 
     const moneyText = document.getElementById("moneyText");
     const pointText = document.getElementById("pointText");
-    const msgCountText = document.getElementById("msgCountText"); 
+    const msgCountText = document.getElementById("msgCountText");
     const userNameText = document.getElementById("userNameText");
-    const amountInput = document.getElementById("amount");
-    const historyBody = document.getElementById("historyBody");
-    
-    // Header elements
     const loginToggleBtn = document.getElementById("loginToggleBtn");
     const adminBtn = document.getElementById("adminBtn");
     const balanceInfo = document.getElementById("balanceInfo");
     const registerBtn = document.getElementById("registerBtn");
 
-    // Auth Modal elements
     const authModalBackdrop = document.getElementById("authModalBackdrop");
     const modalClose = document.getElementById("modalClose");
     const loginFormContainer = document.getElementById("loginFormContainer");
     const registerFormContainer = document.getElementById("registerFormContainer");
     const modalTitle = document.getElementById("modalTitle");
+
     const loginEmail = document.getElementById("loginEmail");
     const loginPassword = document.getElementById("loginPassword");
     const loginSubmit = document.getElementById("loginSubmit");
     const loginError = document.getElementById("loginError");
-    const regEmail = document.getElementById("regEmail");
+
+    const regId = document.getElementById("regId"); // Changed from regEmail in the original script but HTML uses regId
     const regPassword = document.getElementById("regPassword");
     const regNickname = document.getElementById("regNickname");
+    const regBank = document.getElementById("regBank");
+    const regAccountNumber = document.getElementById("regAccountNumber");
+    const regAccountHolder = document.getElementById("regAccountHolder");
+    const regWithdrawPassword = document.getElementById("regWithdrawPassword");
     const regPhone = document.getElementById("regPhone");
     const regSubmit = document.getElementById("regSubmit");
     const regError = document.getElementById("regError");
+
     const switchToRegister = document.getElementById("switchToRegister");
     const switchToLogin = document.getElementById("switchToLogin");
 
-    // Side Menu elements
     const sideMenuBackdrop = document.getElementById("sideMenuBackdrop");
     const sideMenuClose = document.getElementById("sideMenuClose");
     const openDrawerBtn = document.getElementById("openDrawerBtn");
-    
-    // Nav links for guarding
+
+    // nav 링크
     const navDeposit = document.getElementById("navDeposit");
     const navExchange = document.getElementById("navExchange");
     const navMessages = document.getElementById("navMessages");
 
-    // Account Inquiry elements
+    // Account Inquiry elements (for deposit.html)
     const contactAccountBtn = document.getElementById("contactAccountBtn");
     const passwordCheckSection = document.getElementById("passwordCheckSection");
     const accountPasswordCheck = document.getElementById("accountPasswordCheck");
     const verifyPasswordBtn = document.getElementById("verifyPasswordBtn");
     const passwordCheckError = document.getElementById("passwordCheckError");
     const depositAccountDisplay = document.getElementById("depositAccountDisplay");
+    const displayedAccountBank = document.getElementById("displayedAccountBank");
+    const displayedAccountNumber = document.getElementById("displayedAccountNumber");
+    const displayedAccountHolder = document.getElementById("displayedAccountHolder");
+
 
     let currentUserId = null;
     let currentUserProfile = null;
@@ -632,70 +667,157 @@
     }
 
     // 사이드 메뉴
-    function openSideMenu() { sideMenuBackdrop.classList.add("open"); }
-    function closeSideMenuFn() { sideMenuBackdrop.classList.remove("open"); }
+    function openSideMenu() {
+      sideMenuBackdrop.classList.add("open");
+    }
+    function closeSideMenuFn() {
+      sideMenuBackdrop.classList.remove("open");
+    }
+
     openDrawerBtn.addEventListener("click", openSideMenu);
     sideMenuClose.addEventListener("click", closeSideMenuFn);
     sideMenuBackdrop.addEventListener("click", (e) => {
       if (e.target === sideMenuBackdrop) closeSideMenuFn();
     });
 
-    // 로그인/로그아웃/회원가입 버튼 리스너
+    // 로그인/로그아웃 토글
     loginToggleBtn.addEventListener("click", () => {
       if (auth.currentUser) {
-        if (confirm("로그아웃 하시겠습니까?")) logoutUser();
+        if (confirm("로그아웃 하시겠습니까?")) {
+          logoutUser();
+        }
       } else {
         openModal("login");
       }
     });
-    registerBtn.addEventListener("click", () => openModal("register"));
-    adminBtn.addEventListener("click", () => { window.location.href = "admin.html"; });
+
+    // 회원가입 버튼
+    registerBtn.addEventListener("click", () => {
+      openModal("register");
+    });
+
+    // 관리자페이지 버튼
+    adminBtn.addEventListener("click", () => {
+      window.location.href = "admin.html";
+    });
+
     switchToRegister.addEventListener("click", () => openModal("register"));
     switchToLogin.addEventListener("click", () => openModal("login"));
-    if(modalClose) modalClose.addEventListener("click", closeModal);
+    modalClose.addEventListener("click", closeModal);
     authModalBackdrop.addEventListener("click", (e) => {
       if (e.target === authModalBackdrop) closeModal();
     });
 
-    // 로그인/회원가입 폼 제출
+    // 로그인
     loginSubmit.addEventListener("click", async () => {
       loginError.textContent = "";
       let emailInput = loginEmail.value.trim();
       const password = loginPassword.value;
-      if (!emailInput || !password) return loginError.textContent = "아이디와 비밀번호를 모두 입력하세요.";
-      
+
+      if (!emailInput || !password) {
+        loginError.textContent = "아이디와 비밀번호를 모두 입력하세요.";
+        return;
+      }
+      const email = normalizeEmail(emailInput);
+
       try {
-        await loginUser(normalizeEmail(emailInput), password);
+        await loginUser(email, password);
         closeModal();
       } catch (err) {
+        console.log("Firebase login error:", err.code, err.message);
         loginError.textContent = translateAuthError(err);
       }
     });
 
+    // 회원가입
     regSubmit.addEventListener("click", async () => {
       regError.textContent = "";
-      const email = normalizeEmail(regEmail.value.trim());
+      let idInput = regId.value.trim(); // Use regId, not regEmail
       const password = regPassword.value;
       const nickname = regNickname.value.trim();
-      if (!email || !password || !nickname) return regError.textContent = "필수 항목을 모두 입력해주세요.";
+      const bank = regBank.value.trim();
+      const accountNumber = regAccountNumber.value.trim();
+      const accountHolder = regAccountHolder.value.trim();
+      const withdrawPassword = regWithdrawPassword.value.trim();
+      const phone = regPhone.value.trim();
+
+      if (!idInput || !password || !nickname || !bank || !accountNumber || !accountHolder || !withdrawPassword) {
+        regError.textContent = "필수 항목을 모두 입력해주세요.";
+        return;
+      }
+      if (withdrawPassword.length !== 4 || !/^\d+$/.test(withdrawPassword)) {
+          regError.textContent = "출금비번은 숫자 4자리여야 합니다.";
+          return;
+      }
+
+      const email = normalizeEmail(idInput);
 
       try {
-        await registerUser({ email, password, nickname, phone: regPhone.value.trim() });
-        alert("회원가입이 완료되었습니다. 관리자 승인 후 로그인 가능합니다.");
+        await registerUser({
+          email,
+          password,
+          nickname,
+          bank,
+          accountNumber,
+          accountHolder,
+          withdrawPassword,
+          phone
+        });
+        alert("회원가입이 완료되었습니다. 자동으로 로그인됩니다.");
+        alert("관리자 승인 후 모든 서비스를 이용할 수 있습니다.");
         closeModal();
       } catch (err) {
+        console.log("Firebase register error:", err.code, err.message);
         regError.textContent = translateAuthError(err);
       }
     });
 
+    // 메인 탭(라이브/슬롯)
+    const mainTabs = document.querySelectorAll(".main-tab");
+    const liveTab = document.getElementById("liveTab");
+    const slotTab = document.getElementById("slotTab");
+
+    mainTabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        mainTabs.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        const key = tab.dataset.tab;
+        if (key === "live") {
+          liveTab.style.display = "grid";
+          slotTab.style.display = "none";
+        } else {
+          liveTab.style.display = "none";
+          slotTab.style.display = "grid";
+        }
+      });
+    });
+
+    // 게임 카드 클릭 (로그인 안 되어 있으면 로그인 모달)
+    document.querySelectorAll(".provider-card").forEach(card => {
+      card.addEventListener("click", () => {
+        const url = card.dataset.url;
+        if (!url || url === "#") return;
+
+        if (!auth.currentUser) {
+          alert("로그인이 필요한 서비스입니다.");
+          openModal("login");
+          return;
+        }
+        window.location.href = url;
+      });
+    });
+
     // 쪽지 개수
     async function fetchUnreadMessageCount(uid) {
-      const q = query(collection(db, "userMessages", uid, "messages"), where("read", "==", false));
+      const q = query(
+        collection(db, "userMessages", uid, "messages"),
+        where("read", "==", false)
+      );
       const snap = await getDocs(q);
       return snap.size;
     }
 
-    // 네비게이션 가드
+    // ★★ nav 클릭 시 로그인 안 되어 있으면 이동 막고 로그인 모달 띄우기
     function guardNavLink(anchor, targetPageName) {
       if (!anchor) return;
       anchor.addEventListener("click", (e) => {
@@ -710,149 +832,72 @@
     guardNavLink(navExchange, "환전");
     guardNavLink(navMessages, "쪽지함");
 
-    // 인증 상태 리스너 (메인 로직)
+    // 인증 상태
     listenAuth(async (user) => {
       if (!user) {
         userNameText.textContent = "로그인이 필요합니다";
         balanceInfo.style.display = "none";
         loginToggleBtn.textContent = "로그인";
-        registerBtn.style.display = "inline-block";
+        registerBtn.style.display = "inline-block"; // Show register button when logged out
         adminBtn.style.display = "none";
-        currentUserId = null;
-        currentUserProfile = null;
         return;
       }
-      
       balanceInfo.style.display = "block";
       loginToggleBtn.textContent = "로그아웃";
-      registerBtn.style.display = "none";
+      registerBtn.style.display = "none"; // Hide register button when logged in
 
       try {
-        currentUserId = user.uid;
         const profile = await fetchCurrentUserProfile(user.uid);
-        currentUserProfile = profile;
         
-        if (profile.status === 'pending') {
-            alert('관리자 승인 대기 중인 계정입니다. 자동으로 로그아웃됩니다.');
-            logoutUser();
-            return;
-        }
-
-        userNameText.textContent = `${profile?.nickname || user.email}님`;
-        moneyText.textContent = (profile?.money ?? 0).toLocaleString();
-        pointText.textContent = (profile?.point ?? 0).toLocaleString();
-        adminBtn.style.display = (profile?.role === "admin") ? "inline-block" : "none";
-        
-        const unread = await fetchUnreadMessageCount(user.uid);
-        msgCountText.textContent = String(unread);
-        
-        loadDepositHistory(user.uid);
-      } catch (err) {
-        console.error("Profile/message load error:", err);
-        // Handle potential error gracefully
-      }
-    });
-
-    // 금액 버튼
-    document.querySelector('.quick-buttons').addEventListener('click', (e) => {
-      if (e.target.tagName === 'BUTTON') {
-        if (e.target.id === 'resetBtn') {
-          amountInput.value = '0';
-        } else {
-          const currentAmount = parseInt(amountInput.value.replace(/,/g, '')) || 0;
-          const addAmount = parseInt(e.target.dataset.amount);
-          amountInput.value = (currentAmount + addAmount).toLocaleString();
-        }
-      }
-    });
-
-    // 충전 신청
-    document.getElementById('submitBtn').addEventListener('click', async () => {
-      const amount = parseInt(amountInput.value.replace(/,/g, '')) || 0;
-      if (amount <= 0) return alert("충전할 금액을 입력해주세요.");
-      if (!currentUserId) return alert("로그인이 필요합니다.");
-      if (!confirm(`${amount.toLocaleString()}원을 충전하시겠습니까?`)) return;
-
-      try {
-        if (!currentUserProfile) throw new Error("사용자 정보를 불러올 수 없습니다.");
-        await addDoc(collection(db, "depositRequests"), {
-          userId: currentUserId,
-          amount: amount,
-          depositorName: currentUserProfile.nickname || currentUserProfile.email,
-          status: "pending",
-          timestamp: serverTimestamp()
-        });
-        alert("충전 신청이 완료되었습니다. 관리자 확인 후 처리됩니다.");
-        amountInput.value = '0';
-      } catch (err) {
-        console.error(err);
-        alert("오류가 발생했습니다. 다시 시도해주세요.");
-      }
-    });
-
-    // 계좌 문의 로직
-    contactAccountBtn.addEventListener('click', () => {
-        if (!currentUserId) return alert("로그인이 필요합니다.");
-        passwordCheckSection.classList.remove('hidden');
-        depositAccountDisplay.classList.add('hidden');
-        accountPasswordCheck.value = '';
-        passwordCheckError.textContent = '';
-    });
-
-    verifyPasswordBtn.addEventListener('click', async () => {
-        const password = accountPasswordCheck.value;
-        if (!password) {
-            passwordCheckError.textContent = "비밀번호를 입력해주세요.";
-            return;
-        }
-        
-        try {
-            // Re-authenticate to verify password
-            await loginUser(auth.currentUser.email, password);
-            
-            // On success, fetch and show account info
-            const docSnap = await getDoc(doc(db, "config", "depositAccount"));
-            if (docSnap.exists()) {
-                const { bank, number, holder } = docSnap.data();
-                document.getElementById('displayedAccountBank').textContent = `은행: ${bank}`;
-                document.getElementById('displayedAccountNumber').textContent = `계좌번호: ${number}`;
-                document.getElementById('displayedAccountHolder').textContent = `예금주: ${holder}`;
-                depositAccountDisplay.classList.remove('hidden');
-                passwordCheckSection.classList.add('hidden');
-            } else {
-                alert("입금 계좌 정보가 등록되지 않았습니다.");
-            }
-        } catch (error) {
-            passwordCheckError.textContent = "비밀번호가 일치하지 않습니다.";
-        }
-    });
-    
-    // 충전 내역
-    function loadDepositHistory(userId) {
-      const q = query(collection(db, "depositRequests"), where("userId", "==", userId), orderBy("timestamp", "desc"));
-      onSnapshot(q, (snapshot) => {
-        historyBody.innerHTML = '';
-        if (snapshot.empty) {
-          historyBody.innerHTML = '<tr><td colspan="3" class="py-4 text-gray-500">충전 내역이 없습니다.</td></tr>';
+        if (profile && profile.status === 'pending') {
+          alert("관리자의 가입 승인을 기다리는 중입니다. 자동으로 로그아웃됩니다.");
+          logoutUser();
           return;
         }
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          const date = data.timestamp?.toDate();
-          const formattedDate = date ? `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}` : '대기중';
-          
-          let statusText, statusClass;
-          switch (data.status) {
-            case 'approved': statusText = '완료'; statusClass = 'status-completed'; break;
-            case 'rejected': statusText = '거절'; statusClass = 'status-rejected'; break;
-            default: statusText = '대기중'; statusClass = 'status-pending';
-          }
 
-          const row = `<tr><td>${data.amount.toLocaleString()}원</td><td>${formattedDate}</td><td class="${statusClass}">${statusText}</td></tr>`;
-          historyBody.innerHTML += row;
-        });
+        const nickname = profile?.nickname || user.email;
+        userNameText.textContent = nickname + "님";
+
+        const money = profile?.money ?? 0;
+        const point = profile?.point ?? 0;
+        moneyText.textContent = money.toLocaleString();
+        pointText.textContent = point.toLocaleString();
+
+        const isAdmin = profile?.role === "admin" || profile?.isAdmin === true;
+        adminBtn.style.display = isAdmin ? "inline-block" : "none";
+      } catch (err) {
+        console.error("profile load error:", err);
+        userNameText.textContent = (user.email || "알 수 없는 유저") + "님";
+        adminBtn.style.display = "none";
+      }
+
+      try {
+        const unread = await fetchUnreadMessageCount(user.uid);
+        msgCountText.textContent = String(unread);
+      } catch (err) {
+        console.error("message count error:", err);
+        msgCountText.textContent = "0";
+      }
+    });
+  </script>
+  <script>
+    document.querySelectorAll('.password-toggle').forEach(toggle => {
+      toggle.addEventListener('click', () => {
+        const passwordField = toggle.previousElementSibling;
+        const eyeOpen = toggle.querySelector('.eye-open');
+        const eyeClose = toggle.querySelector('.eye-close');
+
+        if (passwordField.type === 'password') {
+          passwordField.type = 'text';
+          eyeOpen.style.display = 'none';
+          eyeClose.style.display = 'block';
+        } else {
+          passwordField.type = 'password';
+          eyeOpen.style.display = 'block';
+          eyeClose.style.display = 'none';
+        }
       });
-    }
+    });
   </script>
 </body>
 </html>
