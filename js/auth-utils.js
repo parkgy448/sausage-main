@@ -44,6 +44,7 @@ export async function registerUser({
     accountHolder: accountHolder || "",
     withdrawPassword: withdrawPassword || "", // 주의: 비밀번호는 암호화하는 것이 좋습니다.
     role: "user",      // 기본은 일반 유저
+    status: "pending", // 가입 승인 대기 상태
     money: 0,
     point: 0,
     createdAt: serverTimestamp()
