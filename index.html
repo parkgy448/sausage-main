@@ -433,6 +433,29 @@
       opacity: 0.8;
     }
   </style>
+  <style>
+    /* LiveChat widget position override */
+    div#livechat-widget {
+      bottom: 65px !important;
+      transform: translateX(50%) !important; /* Center the widget on the coordinate */
+    }
+
+    /* For smaller screens where nav bar is 100% width */
+    @media (max-width: 639px) {
+      div#livechat-widget {
+        right: 10% !important; /* 10% from right is center of last of 5 items */
+        left: auto !important;
+      }
+    }
+
+    /* For larger screens where nav bar is 640px and centered */
+    @media (min-width: 640px) {
+      div#livechat-widget {
+        right: calc(50% - 256px) !important; /* (50% - 320px) is right edge of screen to nav bar, +64px for center of last item */
+        left: auto !important;
+      }
+    }
+  </style>
 </head>
 <body>
   <!-- 상단바 -->
@@ -989,5 +1012,15 @@
       });
     });
   </script>
+<!-- Start of LiveChat (www.livechat.com) code -->
+<script>
+    window.__lc = window.__lc || {};
+    window.__lc.license = 19388918;
+    window.__lc.integration_name = "manual_onboarding";
+    window.__lc.product_name = "livechat";
+    ;(function(n,t,c){function i(n){return e._h?e._h.apply(null,n):e._q.push(n)}var e={_q:[],_h:null,_v:"2.0",on:function(){i(["on",c.call(arguments)])},once:function(){i(["once",c.call(arguments)])},off:function(){i(["off",c.call(arguments)])},get:function(){if(!e._h)throw new Error("[LiveChatWidget] You can't use getters before load.");return i(["get",c.call(arguments)])},call:function(){i(["call",c.call(arguments)])},init:function(){var n=t.createElement("script");n.async=!0,n.type="text/javascript",n.src="https://cdn.livechatinc.com/tracking.js",t.head.appendChild(n)}};!n.__lc.asyncInit&&e.init(),n.LiveChatWidget=n.LiveChatWidget||e}(window,document,[].slice))
+</script>
+<noscript><a href="https://www.livechat.com/chat-with/19388918/" rel="nofollow">Chat with us</a>, powered by <a href="https://www.livechat.com/?welcome" rel="noopener nofollow" target="_blank">LiveChat</a></noscript>
+<!-- End of LiveChat code -->
 </body>
 </html>
