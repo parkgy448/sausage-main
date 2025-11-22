@@ -17,7 +17,16 @@ import {
 import { auth, db } from "./firebase-config.js";
 
 // 회원가입
-export async function registerUser({ email, password, nickname, phone }) {
+export async function registerUser({
+  email,
+  password,
+  nickname,
+  phone,
+  bank,
+  accountNumber,
+  accountHolder,
+  withdrawPassword
+}) {
   const userCredential = await createUserWithEmailAndPassword(auth, email, password);
   const user = userCredential.user;
 
@@ -30,6 +39,10 @@ export async function registerUser({ email, password, nickname, phone }) {
     email,
     nickname,
     phone: phone || "",
+    bank: bank || "",
+    accountNumber: accountNumber || "",
+    accountHolder: accountHolder || "",
+    withdrawPassword: withdrawPassword || "", // 주의: 비밀번호는 암호화하는 것이 좋습니다.
     role: "user",      // 기본은 일반 유저
     money: 0,
     point: 0,
