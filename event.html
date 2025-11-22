@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>이벤트 - SSS CASINO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+        --color-bg: #020617;
+        --color-bg-light: #0f172a;
+        --color-bg-lighter: #1e293b;
+        --color-border: #334155;
+        --color-text: #f9fafb;
+        --color-text-dim: #9ca3af;
+        --color-primary: #f97316;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--color-text);
+      background: radial-gradient(circle at top, #1f2937 0, #020617 55%, #000000 100%);
+    }
+    .accordion-item {
+        background-color: var(--color-bg-light);
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+    }
+    .accordion-header {
+        padding: 16px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .accordion-body {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+        padding: 0 16px;
+        font-size: 14px;
+        line-height: 1.7;
+        color: var(--color-text-dim);
+    }
+    .accordion-item.open .accordion-body {
+        max-height: 1000px; /* 충분히 큰 값 */
+        padding: 0 16px 16px;
+    }
+    .accordion-icon {
+        transition: transform 0.3s ease;
+    }
+    .accordion-item.open .accordion-icon {
+        transform: rotate(180deg);
+    }
+    .top-bar {
+      background: #050814;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 18px;
+    }
+    .logo-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: radial-gradient(circle at 20% 20%, #facc15, #ea580c);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 800;
+      color: #111827;
+    }
+    .user-info {
+      text-align: right;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .user-name-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .login-btn {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: none;
+      background: #6366f1;
+      color: #f9fafb;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .admin-btn {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: none;
+      background: #f97316;
+      color: #111827;
+      font-size: 12px;
+      cursor: pointer;
+      display: none; /* 기본 숨김 */
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-width: 640px;
+      margin: 0 auto;
+      display: flex;
+      background: #020617;
+      border-top: 1px solid rgba(148, 163, 184, 0.3);
+      z-index: 40;
+    }
+    .bottom-item {
+      flex: 1;
+      padding: 4px 0 2px;
+      text-align: center;
+      font-size: 11px;
+      color: #9ca3af;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .bottom-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+    .bottom-label { margin-top: 1px; }
+    .bottom-item.active { color: #f97316; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <header class="top-bar">
+    <div class="logo">
+      <div class="logo-icon">SSS</div>
+      <div>SSS CASINO</div>
+    </div>
+    <div class="user-info">
+      <div id="balanceInfo" style="display: none;">
+        머니 : <span id="moneyText">0</span>원
+        &nbsp; 포인트 : <span id="pointText">0</span>원
+        &nbsp; 쪽지 : <span id="msgCountText">0</span>통
+      </div>
+      <div class="user-name-row">
+        <span id="userNameText">로그인이 필요합니다</span>
+        <button id="adminBtn" class="admin-btn">관리자페이지</button>
+        <button id="registerBtn" class="login-btn">회원가입</button>
+        <button id="loginToggleBtn" class="login-btn">로그인</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="p-4 pb-24 max-w-4xl mx-auto w-full">
+    <h1 class="text-2xl font-bold text-orange-400 mb-6">이벤트</h1>
+    <div id="accordionContainer" class="space-y-3">
+      <!-- 이벤트 아이템들이 여기에 동적으로 추가됩니다. -->
+    </div>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="index.html" class="bottom-item">
+      <div class="bottom-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5"></path><path d="M6 10v8.5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V10"></path></svg>
+      </div>
+      <div class="bottom-label">홈</div>
+    </a>
+    <a href="deposit.html" id="navDeposit" class="bottom-item">
+      <div class="bottom-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="7" rx="7" ry="3.5"></ellipse><path d="M5 7v5c0 1.9 3.1 3.5 7 3.5s7-1.6 7-3.5V7"></path><path d="M5 12v3.5C5 17.4 8.1 19 12 19s7-1.6 7-3.5V12"></path></svg></div>
+      <div class="bottom-label">충전신청</div>
+    </a>
+    <button type="button" class="bottom-item" id="openDrawerBtn">
+      <div class="bottom-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg></div>
+      <div class="bottom-label">전체메뉴</div>
+    </button>
+    <a href="exchange.html" id="navExchange" class="bottom-item">
+      <div class="bottom-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="10" rx="2"></rect><path d="M8 12h5"></path><path d="M13 10 15 12l-2 2"></path></svg></div>
+      <div class="bottom-label">환전신청</div>
+    </a>
+    <a href="messages.html" id="navMessages" class="bottom-item">
+      <div class="bottom-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.2" y="6" width="17.6" height="12" rx="1.8"></rect><path d="M4.5 7.5 12 12.5l7.5-5"></path></svg></div>
+      <div class="bottom-label">쪽지</div>
+    </a>
+  </nav>
+
+  <script type="module">
+    import { db } from "./js/firebase-config.js";
+    import { collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+    const accordionContainer = document.getElementById('accordionContainer');
+
+    const q = query(collection(db, "events"), where("active", "==", true), orderBy("createdAt", "desc"));
+    
+    onSnapshot(q, (snapshot) => {
+        if (snapshot.empty) {
+            accordionContainer.innerHTML = '<p class="text-center text-gray-500">진행중인 이벤트가 없습니다.</p>';
+            return;
+        }
+        
+        let html = '';
+        snapshot.forEach(doc => {
+            const item = doc.data();
+            const date = item.createdAt?.toDate?.().toLocaleDateString('ko-KR') || '';
+            html += `
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <div>
+                            <div class="font-semibold">${item.title}</div>
+                            <div class="text-xs text-gray-400 mt-1">${date}</div>
+                        </div>
+                        <div class="accordion-icon">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+                    <div class="accordion-body">
+                        <div class="prose prose-invert max-w-none">${item.body.replace(/\n/g, '<br>')}</div>
+                    </div>
+                </div>
+            `;
+        });
+        accordionContainer.innerHTML = html;
+    });
+
+    accordionContainer.addEventListener('click', (e) => {
+        const header = e.target.closest('.accordion-header');
+        if (header) {
+            const item = header.parentElement;
+            item.classList.toggle('open');
+        }
+    });
+  </script>
+
+</body>
+</html>
