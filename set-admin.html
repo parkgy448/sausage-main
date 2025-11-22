@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Set Admin Role</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+<body>
+    <h1>Set User Role to Admin</h1>
+    <input type="text" id="uid" placeholder="Enter User UID">
+    <button onclick="setAdmin()">Set Admin</button>
+
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyCoKaIkh3uGu_YPGfzQDqJTH-LuAZKr970",
+          authDomain: "sausage-main.firebaseapp.com",
+          projectId: "sausage-main",
+          storageBucket: "sausage-main.firebasestorage.app",
+          messagingSenderId: "445362758872",
+          appId: "1:445362758872:web:e53edc4bdca3e75726e3ad"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        function setAdmin() {
+            const uid = document.getElementById('uid').value;
+            if (!uid) {
+                alert("Please enter a UID.");
+                return;
+            }
+            db.collection("users").doc(uid).update({
+                role: "admin"
+            }).then(() => {
+                alert("User role updated to admin successfully!");
+            }).catch((error) => {
+                alert("Error updating user role: " + error);
+            });
+        }
+    </script>
+</body>
+</html>
