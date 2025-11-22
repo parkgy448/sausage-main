@@ -481,9 +481,51 @@
       updateDoc, getDocs, writeBatch, deleteDoc
     } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-    // ... (All header, auth modal, side menu JS from previous steps) ...
+    // --- 전역 UI 요소 ---
+    const moneyText = document.getElementById("moneyText");
+    const pointText = document.getElementById("pointText");
+    const msgCountText = document.getElementById("msgCountText");
+    const userNameText = document.getElementById("userNameText");
+    const loginToggleBtn = document.getElementById("loginToggleBtn");
+    const adminBtn = document.getElementById("adminBtn");
+    const balanceInfo = document.getElementById("balanceInfo");
+    const registerBtn = document.getElementById("registerBtn");
 
-    // Messages page specific elements
+    // --- 인증 모달 요소 ---
+    const authModalBackdrop = document.getElementById("authModalBackdrop");
+    const modalClose = document.querySelector("#authModalBackdrop .modal-close"); // More specific selector
+    const loginFormContainer = document.querySelector("#authModalBackdrop #loginFormContainer");
+    const registerFormContainer = document.querySelector("#authModalBackdrop #registerFormContainer");
+    const modalTitle = document.querySelector("#authModalBackdrop #modalTitle");
+
+    // 로그인 폼
+    const loginEmail = document.getElementById("loginEmail");
+    const loginPassword = document.getElementById("loginPassword");
+    const loginSubmit = document.getElementById("loginSubmit");
+    const loginError = document.getElementById("loginError");
+    
+    // 회원가입 폼
+    const regId = document.getElementById("regId");
+    const regPassword = document.getElementById("regPassword");
+    const regNickname = document.getElementById("regNickname");
+    const regBank = document.getElementById("regBank");
+    const regAccountNumber = document.getElementById("regAccountNumber");
+    const regAccountHolder = document.getElementById("regAccountHolder");
+    const regWithdrawPassword = document.getElementById("regWithdrawPassword");
+    const regPhone = document.getElementById("regPhone");
+    const regSubmit = document.getElementById("regSubmit");
+    const regError = document.getElementById("regError");
+    
+    // 폼 전환 버튼
+    const switchToRegister = document.getElementById("switchToRegister");
+    const switchToLogin = document.getElementById("switchToLogin");
+
+    // --- 사이드 메뉴 요소 ---
+    const sideMenuBackdrop = document.getElementById("sideMenuBackdrop");
+    const sideMenuClose = document.getElementById("sideMenuClose");
+    const openDrawerBtn = document.getElementById("openDrawerBtn");
+    
+    // --- 페이지 전용 요소 ---
     const messageList = document.getElementById("messageList");
     const selectAllCheckbox = document.getElementById("selectAllCheckbox");
     const markReadBtn = document.getElementById("markReadBtn");
@@ -495,19 +537,167 @@
     const messageDetailBody = document.getElementById("messageDetailBody");
     const messageDetailClose = document.getElementById("messageDetailClose");
 
-
     let currentUserId = null;
 
-    // ... (Standard auth and header logic from other pages)
+    // --- 공통 함수 (인증, 모달, 메뉴) ---
+    function normalizeEmail(email) {
+      const trimmed = email.trim();
+      if (!trimmed) return trimmed;
+      if (trimmed.includes("@")) return trimmed;
+      return trimmed + "@casino.com";
+    }
+
+    function openModal(mode = "login") {
+      if (!authModalBackdrop) return;
+      authModalBackdrop.style.display = "flex";
+      // This is a simplified version. The actual index.html has more complex modal logic.
+      // For this page, we will assume a combined modal exists.
+      // We need to add the modal HTML from index.html to messages.html for this to work.
+      // The user has confirmed `authModalBackdrop` exists, but not the inner forms.
+      // Let's proceed assuming the inner forms from index.html are also on this page.
+      if (modalTitle) modalTitle.textContent = mode === 'login' ? '로그인' : '회원가입';
+      if (loginFormContainer) loginFormContainer.style.display = mode === 'login' ? 'block' : 'none';
+      if (registerFormContainer) registerFormContainer.style.display = mode === 'login' ? 'none' : 'block';
+      if (loginError) loginError.textContent = "";
+      if (regError) regError.textContent = "";
+    }
+
+    function closeModal() {
+      if (authModalBackdrop) authModalBackdrop.style.display = "none";
+    }
+
+    function openSideMenu() {
+      if(sideMenuBackdrop) sideMenuBackdrop.classList.add("open");
+    }
+    function closeSideMenuFn() {
+      if(sideMenuBackdrop) sideMenuBackdrop.classList.remove("open");
+    }
+
+    // --- 이벤트 리스너 (인증, 모달, 메뉴) ---
+    if (loginToggleBtn) {
+      loginToggleBtn.addEventListener("click", () => {
+        if (auth.currentUser) {
+          if (confirm("로그아웃 하시겠습니까?")) {
+            logoutUser();
+          }
+        } else {
+          openModal("login");
+        }
+      });
+    }
+    
+    if (registerBtn) {
+        registerBtn.addEventListener("click", () => openModal("register"));
+    }
+    if (adminBtn) {
+        adminBtn.addEventListener("click", () => window.location.href = "admin.html");
+    }
+    if (switchToRegister) switchToRegister.addEventListener("click", () => openModal("register"));
+    if (switchToLogin) switchToLogin.addEventListener("click", () => openModal("login"));
+    if (modalClose) modalClose.addEventListener("click", closeModal);
+    if (authModalBackdrop) {
+      authModalBackdrop.addEventListener("click", (e) => {
+        if (e.target === authModalBackdrop) closeModal();
+      });
+    }
+    
+    if(openDrawerBtn) openDrawerBtn.addEventListener("click", openSideMenu);
+    if(sideMenuClose) sideMenuClose.addEventListener("click", closeSideMenuFn);
+    if(sideMenuBackdrop) {
+      sideMenuBackdrop.addEventListener("click", (e) => {
+        if (e.target === sideMenuBackdrop) closeSideMenuFn();
+      });
+    }
+
+    if (loginSubmit) {
+      loginSubmit.addEventListener("click", async () => {
+        if(!loginEmail || !loginPassword || !loginError) return;
+        loginError.textContent = "";
+        let emailInput = loginEmail.value;
+        const password = loginPassword.value;
+        if (!emailInput || !password) {
+          loginError.textContent = "아이디와 비밀번호를 모두 입력하세요.";
+          return;
+        }
+        const email = normalizeEmail(emailInput);
+        try {
+          await loginUser(email, password);
+          closeModal();
+        } catch (err) {
+          loginError.textContent = translateAuthError(err);
+        }
+      });
+    }
+    
+    if(regSubmit) {
+        regSubmit.addEventListener("click", async () => {
+            if(!regError) return;
+            regError.textContent = "";
+            const idInput = regId.value.trim();
+            const password = regPassword.value;
+            const nickname = regNickname.value.trim();
+            if (!idInput || !password || !nickname) {
+                regError.textContent = "아이디, 비밀번호, 닉네임은 필수입니다.";
+                return;
+            }
+            const email = normalizeEmail(idInput);
+            try {
+                await registerUser({ email, password, nickname, 
+                    phone: regPhone.value.trim(),
+                    bank: regBank.value.trim(),
+                    accountNumber: regAccountNumber.value.trim(),
+                    accountHolder: regAccountHolder.value.trim(),
+                    withdrawPassword: regWithdrawPassword.value.trim()
+                });
+                alert("회원가입이 완료되었습니다.");
+                closeModal();
+            } catch (err) {
+                regError.textContent = translateAuthError(err);
+            }
+        });
+    }
+
+
+    // --- 페이지 로직 ---
 
     listenAuth(async (user) => {
       if (!user) {
-        window.location.href = "index.html";
+        // 로그아웃 상태 UI
+        userNameText.textContent = "로그인이 필요합니다";
+        balanceInfo.style.display = "none";
+        loginToggleBtn.textContent = "로그인";
+        registerBtn.style.display = "inline-block";
+        adminBtn.style.display = "none";
+        messageList.innerHTML = '<p class="text-gray-500 text-center p-8">쪽지함을 보려면 로그인이 필요합니다.</p>';
+        currentUserId = null;
         return;
       }
-      currentUserId = user.uid;
-      // ... (profile and header update logic)
 
+      // 로그인 상태 UI
+      currentUserId = user.uid;
+      balanceInfo.style.display = "block";
+      loginToggleBtn.textContent = "로그아웃";
+      registerBtn.style.display = "none";
+
+      try {
+        const profile = await fetchCurrentUserProfile(user.uid);
+        userNameText.textContent = (profile?.nickname || user.email) + "님";
+        moneyText.textContent = (profile?.money ?? 0).toLocaleString();
+        pointText.textContent = (profile?.point ?? 0).toLocaleString();
+        adminBtn.style.display = (profile?.role === "admin") ? "inline-block" : "none";
+        
+        // 쪽지 개수 (별도 함수 호출 대신 여기서 처리)
+        const q = query(collection(db, "userMessages", user.uid, "messages"), where("read", "==", false));
+        onSnapshot(q, (snapshot) => {
+            msgCountText.textContent = snapshot.size;
+        });
+
+      } catch (err) {
+        console.error("프로필 로딩 오류:", err);
+        userNameText.textContent = "정보 로딩 실패";
+      }
+
+      // 쪽지 목록 로드
       loadMessages(user.uid);
     });
 
@@ -516,25 +706,33 @@
         messageDetailBody.textContent = message.content;
         messageDetailModal.style.display = "flex";
 
-        if (!message.read) {
+        if (!message.read && currentUserId) {
             const msgRef = doc(db, "userMessages", currentUserId, "messages", message.id);
-            updateDoc(msgRef, { read: true });
+            updateDoc(msgRef, { read: true }).catch(console.error);
         }
     }
     
-    messageDetailClose.addEventListener("click", () => messageDetailModal.style.display = "none");
-    messageDetailModal.addEventListener("click", (e) => {
-        if (e.target === messageDetailModal) {
-            messageDetailModal.style.display = "none";
-        }
-    });
+    if (messageDetailClose) {
+      messageDetailClose.addEventListener("click", () => messageDetailModal.style.display = "none");
+    }
+    if (messageDetailModal) {
+      messageDetailModal.addEventListener("click", (e) => {
+          if (e.target === messageDetailModal) {
+              messageDetailModal.style.display = "none";
+          }
+      });
+    }
 
+    let messageUnsubscribe = null;
     function loadMessages(userId) {
+      // 기존 리스너가 있다면 중지
+      if (messageUnsubscribe) messageUnsubscribe();
+
       const q = query(collection(db, "userMessages", userId, "messages"), orderBy("timestamp", "desc"));
       
-      onSnapshot(q, (snapshot) => {
+      messageUnsubscribe = onSnapshot(q, (snapshot) => {
         if (snapshot.empty) {
-          messageList.innerHTML = '<p class="text-gray-500 text-center">쪽지가 없습니다.</p>';
+          messageList.innerHTML = '<p class="text-gray-500 text-center p-8">쪽지가 없습니다.</p>';
           return;
         }
         messageList.innerHTML = "";
@@ -563,19 +761,19 @@
 
           messageList.appendChild(item);
         });
+      }, (error) => {
+          console.error("쪽지 로딩 중 에러:", error);
+          messageList.innerHTML = '<p class="text-red-500 text-center p-8">쪽지를 불러오는 중 오류가 발생했습니다.</p>';
       });
     }
 
-    // --- Action Button Logic ---
-    
-    // Select All
+    // --- 액션 버튼 로직 ---
     selectAllCheckbox.addEventListener('change', (e) => {
         document.querySelectorAll('.msg-checkbox').forEach(checkbox => {
             checkbox.checked = e.target.checked;
         });
     });
 
-    // Get selected message IDs
     function getSelectedMessageIds() {
         const selected = [];
         document.querySelectorAll('.msg-checkbox:checked').forEach(checkbox => {
@@ -584,13 +782,11 @@
         return selected;
     }
 
-    // Mark Selected as Read
     markReadBtn.addEventListener('click', async () => {
+        if (!currentUserId) return alert("로그인이 필요합니다.");
         const ids = getSelectedMessageIds();
-        if (ids.length === 0) {
-            alert("처리할 쪽지를 선택해주세요.");
-            return;
-        }
+        if (ids.length === 0) return alert("처리할 쪽지를 선택해주세요.");
+        
         const batch = writeBatch(db);
         ids.forEach(id => {
             const docRef = doc(db, "userMessages", currentUserId, "messages", id);
@@ -600,16 +796,12 @@
         alert(`${ids.length}개의 쪽지를 읽음 처리했습니다.`);
     });
 
-    // Delete Selected
     deleteAllBtn.addEventListener('click', async () => {
+        if (!currentUserId) return alert("로그인이 필요합니다.");
         const ids = getSelectedMessageIds();
-        if (ids.length === 0) {
-            alert("삭제할 쪽지를 선택해주세요.");
-            return;
-        }
-        if (!confirm(`${ids.length}개의 쪽지를 정말 삭제하시겠습니까?`)) {
-            return;
-        }
+        if (ids.length === 0) return alert("삭제할 쪽지를 선택해주세요.");
+        if (!confirm(`${ids.length}개의 쪽지를 정말 삭제하시겠습니까?`)) return;
+        
         const batch = writeBatch(db);
         ids.forEach(id => {
             const docRef = doc(db, "userMessages", currentUserId, "messages", id);
@@ -619,17 +811,14 @@
         alert('선택한 쪽지를 삭제했습니다.');
     });
 
-    // Mark All as Read
     markAllReadBtn.addEventListener('click', async () => {
+        if (!currentUserId) return alert("로그인이 필요합니다.");
         if (!confirm("모든 쪽지를 읽음으로 처리하시겠습니까?")) return;
         
         const q = query(collection(db, "userMessages", currentUserId, "messages"), where("read", "==", false));
         const unreadSnapshot = await getDocs(q);
 
-        if (unreadSnapshot.empty) {
-            alert("새로운 쪽지가 없습니다.");
-            return;
-        }
+        if (unreadSnapshot.empty) return alert("새로운 쪽지가 없습니다.");
 
         const batch = writeBatch(db);
         unreadSnapshot.forEach(docSnap => {

@@ -640,7 +640,7 @@
         </div>
         <div class="field password-field">
           <label for="regWithdrawPassword">출금비번</label>
-          <input id="regWithdrawPassword" type="password" placeholder="비밀번호 입력" />
+          <input id="regWithdrawPassword" type="password" placeholder="숫자 4자리" autocomplete="new-password" />
         </div>
         <div class="field">
           <label for="regPhone">휴대폰 번호</label>
@@ -692,9 +692,13 @@
     const loginSubmit = document.getElementById("loginSubmit");
     const loginError = document.getElementById("loginError");
 
-    const regEmail = document.getElementById("regEmail");
+    const regId = document.getElementById("regId"); // Changed from regEmail in the original script but HTML uses regId
     const regPassword = document.getElementById("regPassword");
     const regNickname = document.getElementById("regNickname");
+    const regBank = document.getElementById("regBank");
+    const regAccountNumber = document.getElementById("regAccountNumber");
+    const regAccountHolder = document.getElementById("regAccountHolder");
+    const regWithdrawPassword = document.getElementById("regWithdrawPassword");
     const regPhone = document.getElementById("regPhone");
     const regSubmit = document.getElementById("regSubmit");
     const regError = document.getElementById("regError");
@@ -804,22 +808,35 @@
     // 회원가입
     regSubmit.addEventListener("click", async () => {
       regError.textContent = "";
-      let emailInput = regEmail.value.trim();
+      let idInput = regId.value.trim(); // Use regId, not regEmail
       const password = regPassword.value;
       const nickname = regNickname.value.trim();
+      const bank = regBank.value.trim();
+      const accountNumber = regAccountNumber.value.trim();
+      const accountHolder = regAccountHolder.value.trim();
+      const withdrawPassword = regWithdrawPassword.value.trim();
       const phone = regPhone.value.trim();
 
-      if (!emailInput || !password || !nickname) {
+      if (!idInput || !password || !nickname || !bank || !accountNumber || !accountHolder || !withdrawPassword) {
         regError.textContent = "필수 항목을 모두 입력해주세요.";
         return;
       }
-      const email = normalizeEmail(emailInput);
+      if (withdrawPassword.length !== 4 || !/^\d+$/.test(withdrawPassword)) {
+          regError.textContent = "출금비번은 숫자 4자리여야 합니다.";
+          return;
+      }
+
+      const email = normalizeEmail(idInput);
 
       try {
         await registerUser({
           email,
           password,
           nickname,
+          bank,
+          accountNumber,
+          accountHolder,
+          withdrawPassword,
           phone
         });
         alert("회원가입이 완료되었습니다. 자동으로 로그인됩니다.");
