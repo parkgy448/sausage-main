@@ -391,6 +391,10 @@
         <label for="accountHolder">예금주</label>
         <input type="text" id="accountHolder" placeholder="환전받을 계좌의 예금주" />
       </div>
+      <div class="field">
+        <label for="withdrawPassword">출금 비밀번호</label>
+        <input type="password" id="withdrawPassword" placeholder="출금 비밀번호 4자리" />
+      </div>
     </div>
 
     <button id="submitBtn" class="action-btn">환전하기</button>
@@ -533,7 +537,7 @@
 
   <script type="module">
     import { auth, db } from "./js/firebase-config.js";
-    import { addDoc, collection, query, where, orderBy, onSnapshot, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    import { addDoc, collection, query, where, orderBy, onSnapshot, serverTimestamp, getDocs, doc, runTransaction } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
     import { listenAuth, logoutUser, fetchCurrentUserProfile, loginUser, registerUser, translateAuthError } from "./js/auth-utils.js";
 
     const moneyText = document.getElementById("moneyText");
@@ -584,6 +588,7 @@
     const navMessages = document.getElementById("navMessages");
 
     let currentUserId = null;
+    let currentUserProfile = null;
 
     // 아이디만 입력해도 이메일로 변환
     function normalizeEmail(email) {
@@ -737,6 +742,7 @@
         registerBtn.style.display = "inline-block";
         adminBtn.style.display = "none";
         currentUserId = null;
+        currentUserProfile = null; // Clear profile on logout
         return;
       }
       balanceInfo.style.display = "block";
@@ -746,6 +752,7 @@
       try {
         currentUserId = user.uid;
         const profile = await fetchCurrentUserProfile(user.uid);
+        currentUserProfile = profile; // Store profile in higher-scoped variable
         const nickname = profile?.nickname || user.email;
         userNameText.textContent = nickname + "님";
 
@@ -790,42 +797,60 @@
       const bank = bankNameInput.value.trim();
       const account = accountNumberInput.value.trim();
       const accountName = accountHolderInput.value.trim();
+      const withdrawPassword = document.getElementById('withdrawPassword').value;
 
-      if (amount <= 0) {
-        alert("환전할 금액을 입력해주세요.");
-        return;
-      }
-      if (!bank || !account || !accountName) {
-        alert("은행명, 계좌번호, 예금주를 모두 입력해주세요.");
-        return;
-      }
+      if (amount <= 0) return alert("환전할 금액을 입력해주세요.");
+      if (!bank || !account || !accountName) return alert("은행명, 계좌번호, 예금주를 모두 입력해주세요.");
+      if (!withdrawPassword) return alert("출금 비밀번호를 입력해주세요.");
 
-      if (!currentUserId) { // Ensure user is logged in before submitting
+      if (!currentUserId || !currentUserProfile) {
         alert("로그인이 필요합니다.");
         openModal("login");
         return;
       }
-
-      if (!confirm(`${amount.toLocaleString()}원을 환전하시겠습니까?`)) {
-        return;
+      
+      if (currentUserProfile.withdrawPassword !== withdrawPassword) {
+        return alert("출금 비밀번호가 일치하지 않습니다.");
       }
 
+      if (!confirm(`${amount.toLocaleString()}원을 환전하시겠습니까?`)) return;
+
+      const userRef = doc(db, "users", currentUserId);
+      const exchangeRef = doc(collection(db, "exchangeRequests"));
+
       try {
-        await addDoc(collection(db, "exchangeRequests"), {
-          userId: currentUserId,
-          nickname: userNameText.textContent.replace('님', ''),
-          amount,
-          bank,
-          account,
-          accountName,
-          status: "pending",
-          timestamp: serverTimestamp()
+        await runTransaction(db, async (transaction) => {
+          const userDoc = await transaction.get(userRef);
+          if (!userDoc.exists()) {
+            throw "사용자 정보를 찾을 수 없습니다.";
+          }
+
+          const currentMoney = userDoc.data().money || 0;
+          if (currentMoney < amount) {
+            throw "잔액이 부족합니다.";
+          }
+
+          const newMoney = currentMoney - amount;
+          transaction.update(userRef, { money: newMoney });
+          
+          transaction.set(exchangeRef, {
+            userId: currentUserId,
+            nickname: currentUserProfile.nickname || currentUserProfile.email,
+            amount,
+            bank,
+            account,
+            accountName,
+            status: "pending",
+            timestamp: serverTimestamp()
+          });
         });
+
         alert("환전 신청이 완료되었습니다. 관리자 확인 후 처리됩니다.");
         amountInput.value = '0';
+        
       } catch (err) {
-        console.error(err);
-        alert("오류가 발생했습니다. 다시 시도해주세요.");
+        console.error("환전 신청 오류: ", err);
+        alert(`오류가 발생했습니다: ${err}`);
       }
     });
     
