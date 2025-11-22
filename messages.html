@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>쪽지함 - SSS CASINO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 55%, #000000 100%);
+      color: #f9fafb;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 10px 16px;
+      background: #050814;
+      border-bottom: 1px solid rgba(148,163,184,.3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+    }
+    main {
+      flex: 1;
+      padding: 16px;
+      max-width: 640px;
+      margin: 0 auto 60px;
+      width: 100%;
+    }
+    h1 { font-size: 18px; margin-bottom: 12px; }
+    table { width:100%; border-collapse: collapse; font-size:12px;}
+    th,td { border-bottom:1px solid rgba(148,163,184,.3); padding:8px 4px; text-align:left;}
+    .title-unread { color:#f97316; font-weight:600; }
+    .msg-body {
+      margin-top: 8px;
+      font-size: 12px;
+      padding: 8px;
+      background:#020617;
+      border-radius:8px;
+      border:1px solid rgba(148,163,184,.4);
+    }
+    button {
+      border-radius:999px; border:none; padding:4px 8px; font-size:11px;
+      cursor:pointer; background:#4b5563; color:#e5e7eb;
+    }
+    nav.bottom-nav {
+      position:fixed; bottom:0; left:0; right:0;
+      max-width:640px; margin:0 auto;
+      display:flex; background:#020617; border-top:1px solid rgba(148,163,184,.3);
+      font-size:11px; color:#9ca3af;
+    }
+    nav .bottom-item { flex:1; text-align:center; padding:8px 0 6px; text-decoration:none; color:inherit;}
+    nav .bottom-item span { display:block; font-size:18px; margin-bottom:2px;}
+    nav .active { color:#f97316; }
+  </style>
+</head>
+<body>
+  <header>
+    <div>쪽지함</div>
+    <div id="userLabel" style="font-size:12px;">로그인 필요</div>
+  </header>
+
+  <main>
+    <h1>쪽지 목록</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>제목</th>
+          <th>시간</th>
+          <th>상태</th>
+          <th>보기</th>
+        </tr>
+      </thead>
+      <tbody id="msgBody">
+        <tr><td colspan="4">쪽지가 없습니다.</td></tr>
+      </tbody>
+    </table>
+
+    <div id="msgDetail" class="msg-body" style="display:none;"></div>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="index.html" class="bottom-item">
+      <span>🏠</span>홈
+    </a>
+    <a href="deposit.html" class="bottom-item">
+      <span>💰</span>충전신청
+    </a>
+    <a href="roulette.html" class="bottom-item">
+      <span>☰</span>전체메뉴
+    </a>
+    <a href="exchange.html" class="bottom-item">
+      <span>💵</span>환전신청
+    </a>
+    <a href="messages.html" class="bottom-item active">
+      <span>✉️</span>쪽지
+    </a>
+  </nav>
+
+  <script type="module">
+    import { db } from "./js/firebase-config.js";
+    import {
+      listenAuth,
+      fetchCurrentUserProfile
+    } from "./js/auth-utils.js";
+    import {
+      collection,
+      query,
+      where,
+      orderBy,
+      onSnapshot,
+      doc,
+      updateDoc
+    } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+    const userLabel = document.getElementById("userLabel");
+    const msgBody = document.getElementById("msgBody");
+    const msgDetail = document.getElementById("msgDetail");
+
+    let currentUser = null;
+
+    listenAuth(async (user) => {
+      if (!user) {
+        alert("로그인이 필요합니다.");
+        window.location.href = "index.html";
+        return;
+      }
+      currentUser = user;
+      const profile = await fetchCurrentUserProfile(user.uid);
+      userLabel.textContent = (profile?.nickname || user.email) + "님";
+
+      const q = query(
+        collection(db, "messages"),
+        where("toUserId", "==", user.uid),
+        orderBy("createdAt", "desc")
+      );
+      onSnapshot(q, (snap) => {
+        if (snap.empty) {
+          msgBody.innerHTML = '<tr><td colspan="4">쪽지가 없습니다.</td></tr>';
+          return;
+        }
+        msgBody.innerHTML = "";
+        snap.forEach(docSnap => {
+          const d = docSnap.data();
+          const tr = document.createElement("tr");
+          const time = d.createdAt?.toDate?.().toLocaleString?.("ko-KR") || "-";
+          const isRead = !!d.read;
+          tr.innerHTML = `
+            <td class="${isRead ? "" : "title-unread"}">${d.title || "(제목 없음)"}</td>
+            <td>${time}</td>
+            <td>${isRead ? "읽음" : "안읽음"}</td>
+            <td><button>보기</button></td>
+          `;
+          const btn = tr.querySelector("button");
+          btn.addEventListener("click", async () => {
+            msgDetail.style.display = "block";
+            msgDetail.textContent = d.body || "";
+            if (!isRead) {
+              await updateDoc(doc(db, "messages", docSnap.id), { read: true });
+            }
+          });
+          msgBody.appendChild(tr);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

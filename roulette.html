@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>전체메뉴 / 룰렛 - SSS CASINO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 55%, #000000 100%);
+      color:#f9fafb; min-height:100vh; display:flex; flex-direction:column;
+    }
+    header {
+      padding:10px 16px; background:#050814; border-bottom:1px solid rgba(148,163,184,.3);
+      display:flex; justify-content:space-between; align-items:center; font-size:14px;
+    }
+    main {
+      flex:1; padding:16px; max-width:640px; margin:0 auto 60px; width:100%;
+    }
+    h1 { font-size:18px; margin-bottom:10px; }
+    p { font-size:13px; color:#e5e7eb; margin-bottom:8px; }
+    .placeholder {
+      margin-top:18px; padding:20px; border-radius:16px;
+      background:#020617; border:1px dashed rgba(148,163,184,.6);
+      text-align:center; font-size:13px; color:#9ca3af;
+    }
+    nav.bottom-nav {
+      position:fixed; bottom:0; left:0; right:0;
+      max-width:640px; margin:0 auto;
+      display:flex; background:#020617; border-top:1px solid rgba(148,163,184,.3);
+      font-size:11px; color:#9ca3af;
+    }
+    nav .bottom-item { flex:1; text-align:center; padding:8px 0 6px; text-decoration:none; color:inherit;}
+    nav .bottom-item span { display:block; font-size:18px; margin-bottom:2px;}
+    nav .active { color:#a855f7; }
+  </style>
+</head>
+<body>
+  <header>
+    <div>전체메뉴 / 룰렛</div>
+    <div id="userLabel" style="font-size:12px;">로그인 필요</div>
+  </header>
+
+  <main>
+    <h1>전체메뉴 (룰렛 플레이스홀더)</h1>
+    <p>여기에 실제 게임(룰렛, 슬롯 등)을 연동하거나, 외부 게임 페이지로 링크를 걸 수 있습니다.</p>
+
+    <div class="placeholder">
+      프론트엔드/게임 엔진 연동 전까지는<br/>
+      단순 안내 페이지로 사용하세요.
+    </div>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="index.html" class="bottom-item">
+      <span>🏠</span>홈
+    </a>
+    <a href="deposit.html" class="bottom-item">
+      <span>💰</span>충전신청
+    </a>
+    <a href="roulette.html" class="bottom-item active">
+      <span>☰</span>전체메뉴
+    </a>
+    <a href="exchange.html" class="bottom-item">
+      <span>💵</span>환전신청
+    </a>
+    <a href="messages.html" class="bottom-item">
+      <span>✉️</span>쪽지
+    </a>
+  </nav>
+
+  <script type="module">
+    import { listenAuth, fetchCurrentUserProfile } from "./js/auth-utils.js";
+
+    const userLabel = document.getElementById("userLabel");
+
+    listenAuth(async (user) => {
+      if (!user) {
+        userLabel.textContent = "로그인 필요";
+        return;
+      }
+      const profile = await fetchCurrentUserProfile(user.uid);
+      userLabel.textContent = (profile?.nickname || user.email) + "님";
+    });
+  </script>
+</body>
+</html>

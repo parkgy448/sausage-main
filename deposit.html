@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>충전신청 - SSS CASINO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 55%, #000000 100%);
+      color: #f9fafb;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 10px 16px;
+      background: #050814;
+      border-bottom: 1px solid rgba(148,163,184,.3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+    }
+    main {
+      flex: 1;
+      padding: 16px;
+      max-width: 640px;
+      margin: 0 auto 60px;
+      width: 100%;
+    }
+    h1 { font-size: 18px; margin-bottom: 12px; }
+    .field { margin-bottom: 12px; }
+    .field label { display:block; font-size: 13px; margin-bottom:4px; }
+    .field input {
+      width: 100%; padding: 8px 10px; border-radius: 10px;
+      border: 1px solid #4b5563; background: #020617; color:#f9fafb;
+    }
+    .primary-btn {
+      width: 100%; padding: 10px; border-radius: 999px;
+      border:none; cursor:pointer;
+      background: linear-gradient(90deg,#22c55e,#4ade80);
+      color:#0f172a; font-weight:600;
+      margin-top:4px;
+    }
+    .error-text { font-size: 12px; color:#f97373; min-height:14px; margin-top:4px;}
+    table { width:100%; border-collapse: collapse; margin-top:18px; font-size:12px;}
+    th, td { border-bottom:1px solid rgba(148,163,184,.3); padding:6px 4px; text-align:left;}
+    nav.bottom-nav {
+      position:fixed; bottom:0; left:0; right:0;
+      max-width:640px; margin:0 auto;
+      display:flex; background:#020617; border-top:1px solid rgba(148,163,184,.3);
+      font-size:11px; color:#9ca3af;
+    }
+    nav .bottom-item { flex:1; text-align:center; padding:8px 0 6px; text-decoration:none; color:inherit;}
+    nav .bottom-item span { display:block; font-size:18px; margin-bottom:2px;}
+    nav .active { color:#22c55e; }
+  </style>
+</head>
+<body>
+  <header>
+    <div>충전신청</div>
+    <div id="userLabel" style="font-size:12px;">로그인 필요</div>
+  </header>
+
+  <main>
+    <h1>충전신청</h1>
+    <p style="font-size:12px;color:#e5e7eb;margin-bottom:10px;">
+      입금 후 충전 신청을 해주세요. 관리자가 확인 후 승인합니다.
+    </p>
+
+    <div class="field">
+      <label for="amountInput">금액 (원)</label>
+      <input id="amountInput" type="number" min="10000" step="1000" />
+    </div>
+    <div class="field">
+      <label for="bankName">입금은행</label>
+      <input id="bankName" type="text" placeholder="예: 국민은행" />
+    </div>
+    <div class="field">
+      <label for="senderName">입금자명</label>
+      <input id="senderName" type="text" />
+    </div>
+    <div class="error-text" id="errorText"></div>
+    <button class="primary-btn" id="submitBtn">충전신청하기</button>
+
+    <h2 style="font-size:15px;margin-top:22px;">나의 충전 내역</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>시간</th>
+          <th>금액</th>
+          <th>상태</th>
+        </tr>
+      </thead>
+      <tbody id="historyBody">
+        <tr><td colspan="3">내역이 없습니다.</td></tr>
+      </tbody>
+    </table>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="index.html" class="bottom-item">
+      <span>🏠</span>홈
+    </a>
+    <a href="deposit.html" class="bottom-item active">
+      <span>💰</span>충전신청
+    </a>
+    <a href="roulette.html" class="bottom-item">
+      <span>☰</span>전체메뉴
+    </a>
+    <a href="exchange.html" class="bottom-item">
+      <span>💵</span>환전신청
+    </a>
+    <a href="messages.html" class="bottom-item">
+      <span>✉️</span>쪽지
+    </a>
+  </nav>
+
+  <script type="module">
+    import { db } from "./js/firebase-config.js";
+    import {
+      listenAuth,
+      fetchCurrentUserProfile
+    } from "./js/auth-utils.js";
+    import {
+      collection,
+      addDoc,
+      serverTimestamp,
+      query,
+      where,
+      orderBy,
+      onSnapshot
+    } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+    const userLabel = document.getElementById("userLabel");
+    const amountInput = document.getElementById("amountInput");
+    const bankName = document.getElementById("bankName");
+    const senderName = document.getElementById("senderName");
+    const errorText = document.getElementById("errorText");
+    const submitBtn = document.getElementById("submitBtn");
+    const historyBody = document.getElementById("historyBody");
+
+    let currentUser = null;
+
+    listenAuth(async (user) => {
+      if (!user) {
+        alert("로그인이 필요합니다.");
+        window.location.href = "index.html";
+        return;
+      }
+      currentUser = user;
+      const profile = await fetchCurrentUserProfile(user.uid);
+      userLabel.textContent = (profile?.nickname || user.email) + "님";
+
+      const q = query(
+        collection(db, "deposits"),
+        where("userId", "==", user.uid),
+        orderBy("createdAt", "desc")
+      );
+      onSnapshot(q, (snap) => {
+        if (snap.empty) {
+          historyBody.innerHTML = '<tr><td colspan="3">내역이 없습니다.</td></tr>';
+          return;
+        }
+        historyBody.innerHTML = "";
+        snap.forEach(docSnap => {
+          const d = docSnap.data();
+          const tr = document.createElement("tr");
+          const time = d.createdAt?.toDate?.().toLocaleString?.("ko-KR") || "-";
+          const amount = (d.amount || 0).toLocaleString() + "원";
+          const status = d.status || "pending";
+          let statusLabel = "대기";
+          if (status === "approved") statusLabel = "승인";
+          else if (status === "rejected") statusLabel = "거절";
+
+          tr.innerHTML = `<td>${time}</td><td>${amount}</td><td>${statusLabel}</td>`;
+          historyBody.appendChild(tr);
+        });
+      });
+    });
+
+    submitBtn.addEventListener("click", async () => {
+      errorText.textContent = "";
+      if (!currentUser) {
+        alert("로그인이 필요합니다.");
+        return;
+      }
+      const amount = parseInt(amountInput.value, 10);
+      if (!amount || amount < 10000) {
+        errorText.textContent = "최소 10,000원 이상 입력해주세요.";
+        return;
+      }
+      if (!bankName.value.trim() || !senderName.value.trim()) {
+        errorText.textContent = "은행과 입금자명을 입력해주세요.";
+        return;
+      }
+
+      try {
+        await addDoc(collection(db, "deposits"), {
+          userId: currentUser.uid,
+          amount,
+          bankName: bankName.value.trim(),
+          senderName: senderName.value.trim(),
+          status: "pending",
+          createdAt: serverTimestamp()
+        });
+        alert("충전 신청이 접수되었습니다.");
+        amountInput.value = "";
+        bankName.value = "";
+        senderName.value = "";
+      } catch (err) {
+        console.error(err);
+        errorText.textContent = "오류: " + err.message;
+      }
+    });
+  </script>
+</body>
+</html>

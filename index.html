@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>SSS CASINO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #f9fafb;
+      /* 어두운 그라데이션 배경 */
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 55%, #000000 100%);
+      display: flex;
+      flex-direction: column;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .top-bar {
+      background: #050814;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 18px;
+    }
+    .logo-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: radial-gradient(circle at 20% 20%, #facc15, #ea580c);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 800;
+      color: #111827;
+    }
+    .user-info {
+      text-align: right;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .user-name-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .login-btn {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: none;
+      background: #6366f1;
+      color: #f9fafb;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .main {
+      flex: 1;
+      padding: 12px 8px 60px;
+      max-width: 640px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .section-title-bar {
+      padding: 8px 8px 4px;
+      font-size: 13px;
+      color: #e5e7eb;
+    }
+    .section-tabs {
+      display: flex;
+      gap: 16px;
+      padding: 0 8px 12px;
+      font-size: 13px;
+    }
+    .section-tabs span {
+      cursor: pointer;
+      padding-bottom: 4px;
+    }
+    .section-tabs .active {
+      color: #f97316;
+      border-bottom: 2px solid #f97316;
+    }
+
+    /* 메인 큰 배너 카드 */
+    .hero-card {
+      margin: 0 8px 16px;
+      border-radius: 18px;
+      padding: 16px;
+      background: linear-gradient(90deg, #f97316, #ec4899);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+    }
+    .hero-avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 20% 20%, #facc15, #ea580c);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #111827;
+      text-align: center;
+    }
+    .hero-text-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .hero-text-sub {
+      font-size: 12px;
+      margin-top: 2px;
+      opacity: 0.9;
+    }
+
+    /* 카테고리 탭 (라이브카지노 / 슬롯머신) */
+    .main-tabs {
+      display: flex;
+      margin: 0 8px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+      margin-bottom: 8px;
+    }
+    .main-tab {
+      flex: 1;
+      text-align: center;
+      padding: 10px 0 6px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .main-tab small {
+      display: block;
+      font-size: 10px;
+      opacity: 0.7;
+    }
+    .main-tab.active {
+      color: #f97316;
+      border-bottom: 2px solid #f97316;
+    }
+
+    /* 카드 리스트 (여기서 카드 크기 크게) */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      padding: 0 8px;
+    }
+    .provider-card {
+      position: relative;
+      border-radius: 18px;
+      padding: 14px;
+      background: radial-gradient(circle at 20% 20%, #4c1d95, #020617);
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.9);
+      min-height: 120px; /* 카드 크기 크게 */
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
+    }
+    .provider-card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: radial-gradient(circle at top left, rgba(244, 114, 182, 0.5), transparent 55%);
+      opacity: 0.6;
+    }
+    .provider-card:hover {
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 1);
+    }
+    .provider-label-ko {
+      position: relative;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .provider-label-en {
+      position: relative;
+      font-size: 11px;
+      opacity: 0.8;
+      margin-top: 2px;
+    }
+    .provider-icon {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #a855f7, #ec4899);
+      opacity: 0.95;
+    }
+
+    /* 하단 탭바 */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-width: 640px;
+      margin: 0 auto;
+      display: flex;
+      background: #020617;
+      border-top: 1px solid rgba(148, 163, 184, 0.3);
+    }
+    .bottom-item {
+      flex: 1;
+      padding: 8px 0 6px;
+      text-align: center;
+      font-size: 11px;
+      cursor: pointer;
+      color: #9ca3af;
+    }
+    .bottom-item span {
+      display: block;
+      font-size: 18px;
+      margin-bottom: 2px;
+    }
+    .bottom-item.active {
+      color: #f97316;
+    }
+
+    /* 모달 공통 */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+    .modal {
+      width: 100%;
+      max-width: 360px;
+      background: #020617;
+      border-radius: 16px;
+      padding: 16px 18px 18px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .modal-header h2 {
+      font-size: 16px;
+    }
+    .modal-close {
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 1;
+    }
+    .field {
+      margin-bottom: 10px;
+    }
+    .field label {
+      display: block;
+      font-size: 11px;
+      margin-bottom: 4px;
+      color: #e5e7eb;
+    }
+    .field input {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #4b5563;
+      background: #020617;
+      color: #f9fafb;
+      font-size: 13px;
+    }
+    .primary-btn {
+      width: 100%;
+      padding: 10px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(90deg, #6366f1, #ec4899);
+      color: #f9fafb;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+    .muted {
+      font-size: 11px;
+      margin-top: 6px;
+      text-align: center;
+      color: #9ca3af;
+      cursor: pointer;
+    }
+    .error-text {
+      font-size: 11px;
+      color: #f97373;
+      min-height: 14px;
+    }
+
+    .section-tabs + * {
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 상단바 -->
+  <header class="top-bar">
+    <div class="logo">
+      <div class="logo-icon">SSS</div>
+      <div>SSS CASINO</div>
+    </div>
+    <div class="user-info">
+      <div>머니 : <span id="moneyText">0원</span>  포인트 : <span id="pointText">0원</span>  쪽지 : 0통</div>
+      <div class="user-name-row">
+        <span id="userNameText">로그인이 필요합니다</span>
+        <button id="loginToggleBtn" class="login-btn">로그인</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="section-title-bar">
+      <strong>제목</strong>
+    </div>
+    <div class="section-tabs">
+      <span class="active">공지사항</span>
+      <span>이벤트</span>
+    </div>
+
+    <!-- 메인 히어로 카드 -->
+    <section class="hero-card">
+      <div class="hero-avatar">SSS<br/>캐릭터</div>
+      <div>
+        <div class="hero-text-title">SSS CASINO</div>
+        <div class="hero-text-sub">라이브 카지노 & 슬롯머신</div>
+      </div>
+    </section>
+
+    <!-- 메인 탭 -->
+    <section class="main-tabs">
+      <div class="main-tab active" data-tab="live">
+        라이브 카지노
+        <small>LIVE CASINO</small>
+      </div>
+      <div class="main-tab" data-tab="slot">
+        슬롯머신
+        <small>SLOT MACHINE</small>
+      </div>
+    </section>
+
+    <!-- 라이브 카지노 카드들 -->
+    <section id="liveTab" class="card-grid">
+      <div class="provider-card" data-url="roulette.html">
+        <div class="provider-icon"></div>
+        <div class="provider-label-ko">에볼루션</div>
+        <div class="provider-label-en">Evolution Gaming</div>
+      </div>
+      <div class="provider-card" data-url="#">
+        <div class="provider-icon"></div>
+        <div class="provider-label-ko">프라그마틱라이브</div>
+        <div class="provider-label-en">Pragmatic Play</div>
+      </div>
+      <div class="provider-card" data-url="#">
+        <div class="provider-icon"></div>
+        <div class="provider-label-ko">아시아게이밍</div>
+        <div class="provider-label-en">Asia Gaming</div>
+      </div>
+      <div class="provider-card" data-url="#">
+        <div class="provider-icon"></div>
+        <div class="provider-label-ko">마이크로게이밍</div>
+        <div class="provider-label-en">Microgaming</div>
+      </div>
+    </section>
+
+    <!-- 슬롯머신 탭 -->
+    <section id="slotTab" class="card-grid" style="display:none;">
+      <div class="provider-card">
+        <div class="provider-icon"></div>
+        <div class="provider-label-ko">슬롯 A</div>
+        <div class="provider-label-en">Slot Provider A</div>
+      </div>
+      <div class="provider-card">
+        <div class="provider-icon"></div>
+        <div class="provider-label-ko">슬롯 B</div>
+        <div class="provider-label-en">Slot Provider B</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 하단 탭바 -->
+  <nav class="bottom-nav">
+    <a href="index.html" class="bottom-item active">
+      <span>🏠</span>홈
+    </a>
+    <a href="deposit.html" class="bottom-item">
+      <span>💰</span>충전신청
+    </a>
+    <a href="roulette.html" class="bottom-item">
+      <span>☰</span>전체메뉴
+    </a>
+    <a href="exchange.html" class="bottom-item">
+      <span>💵</span>환전신청
+    </a>
+    <a href="messages.html" class="bottom-item">
+      <span>✉️</span>쪽지
+    </a>
+  </nav>
+
+  <!-- 로그인/회원가입 모달 -->
+  <div id="authModalBackdrop" class="modal-backdrop">
+    <div class="modal" id="loginModal">
+      <div class="modal-header">
+        <h2 id="modalTitle">로그인</h2>
+        <div id="modalClose" class="modal-close">&times;</div>
+      </div>
+      <div id="loginFormContainer">
+        <div class="field">
+          <label for="loginEmail">아이디 또는 이메일</label>
+          <input id="loginEmail" type="text" autocomplete="username" placeholder="아이디 또는 이메일" />
+        </div>
+        <div class="field">
+          <label for="loginPassword">비밀번호</label>
+          <input id="loginPassword" type="password" autocomplete="current-password" />
+        </div>
+        <div class="error-text" id="loginError"></div>
+        <button class="primary-btn" id="loginSubmit">로그인</button>
+        <div class="muted" id="switchToRegister">회원가입 하러가기</div>
+      </div>
+
+      <div id="registerFormContainer" style="display:none;">
+        <div class="field">
+          <label for="regEmail">아이디 또는 이메일</label>
+          <input id="regEmail" type="text" autocomplete="username" placeholder="아이디 또는 이메일" />
+        </div>
+        <div class="field">
+          <label for="regPassword">비밀번호</label>
+          <input id="regPassword" type="password" autocomplete="new-password" />
+        </div>
+        <div class="field">
+          <label for="regNickname">닉네임</label>
+          <input id="regNickname" type="text" />
+        </div>
+        <div class="field">
+          <label for="regPhone">연락처 (선택)</label>
+          <input id="regPhone" type="tel" />
+        </div>
+        <div class="error-text" id="regError"></div>
+        <button class="primary-btn" id="regSubmit">회원가입</button>
+        <div class="muted" id="switchToLogin">이미 계정이 있어요</div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth } from "./js/firebase-config.js";
+    import {
+      loginUser,
+      registerUser,
+      logoutUser,
+      listenAuth,
+      fetchCurrentUserProfile,
+      translateAuthError
+    } from "./js/auth-utils.js";
+
+    const moneyText = document.getElementById("moneyText");
+    const pointText = document.getElementById("pointText");
+    const userNameText = document.getElementById("userNameText");
+    const loginToggleBtn = document.getElementById("loginToggleBtn");
+
+    const authModalBackdrop = document.getElementById("authModalBackdrop");
+    const modalClose = document.getElementById("modalClose");
+    const loginFormContainer = document.getElementById("loginFormContainer");
+    const registerFormContainer = document.getElementById("registerFormContainer");
+    const modalTitle = document.getElementById("modalTitle");
+
+    const loginEmail = document.getElementById("loginEmail");
+    const loginPassword = document.getElementById("loginPassword");
+    const loginSubmit = document.getElementById("loginSubmit");
+    const loginError = document.getElementById("loginError");
+
+    const regEmail = document.getElementById("regEmail");
+    const regPassword = document.getElementById("regPassword");
+    const regNickname = document.getElementById("regNickname");
+    const regPhone = document.getElementById("regPhone");
+    const regSubmit = document.getElementById("regSubmit");
+    const regError = document.getElementById("regError");
+
+    const switchToRegister = document.getElementById("switchToRegister");
+    const switchToLogin = document.getElementById("switchToLogin");
+
+    // ✅ 아이디만 입력해도 이메일로 변환
+    function normalizeEmail(email) {
+      const trimmed = email.trim();
+      if (!trimmed) return trimmed;
+      // 이미 이메일 형식이면 그대로 사용
+      if (trimmed.includes("@")) return trimmed;
+      // 원하는 도메인으로 붙여주기
+      return trimmed + "@casino.com";
+    }
+
+    function openModal(mode = "login") {
+      authModalBackdrop.style.display = "flex";
+      if (mode === "login") {
+        modalTitle.textContent = "로그인";
+        loginFormContainer.style.display = "block";
+        registerFormContainer.style.display = "none";
+      } else {
+        modalTitle.textContent = "회원가입";
+        loginFormContainer.style.display = "none";
+        registerFormContainer.style.display = "block";
+      }
+      loginError.textContent = "";
+      regError.textContent = "";
+    }
+
+    function closeModal() {
+      authModalBackdrop.style.display = "none";
+    }
+
+    loginToggleBtn.addEventListener("click", () => {
+      if (auth.currentUser) {
+        if (confirm("로그아웃 하시겠습니까?")) {
+          logoutUser();
+        }
+      } else {
+        openModal("login");
+      }
+    });
+
+    switchToRegister.addEventListener("click", () => openModal("register"));
+    switchToLogin.addEventListener("click", () => openModal("login"));
+    modalClose.addEventListener("click", closeModal);
+    authModalBackdrop.addEventListener("click", (e) => {
+      if (e.target === authModalBackdrop) closeModal();
+    });
+
+    // ✅ 로그인: 아이디만 입력해도 자동으로 이메일 변환
+    loginSubmit.addEventListener("click", async () => {
+      loginError.textContent = "";
+
+      let emailInput = loginEmail.value.trim();
+      const password = loginPassword.value;
+
+      if (!emailInput || !password) {
+        loginError.textContent = "아이디와 비밀번호를 모두 입력하세요.";
+        return;
+      }
+
+      const email = normalizeEmail(emailInput);
+
+      try {
+        await loginUser(email, password);
+        closeModal();
+      } catch (err) {
+        console.log("Firebase login error:", err.code, err.message);
+        loginError.textContent = translateAuthError(err);
+      }
+    });
+
+    // ✅ 회원가입: 아이디만 입력해도 자동으로 이메일 변환
+    regSubmit.addEventListener("click", async () => {
+      regError.textContent = "";
+
+      let emailInput = regEmail.value.trim();
+      const password = regPassword.value;
+      const nickname = regNickname.value.trim();
+      const phone = regPhone.value.trim();
+
+      if (!emailInput || !password || !nickname) {
+        regError.textContent = "필수 항목을 모두 입력해주세요.";
+        return;
+      }
+
+      const email = normalizeEmail(emailInput);
+
+      try {
+        await registerUser({
+          email,
+          password,
+          nickname,
+          phone
+        });
+        alert("회원가입이 완료되었습니다. 자동으로 로그인됩니다.");
+        closeModal();
+      } catch (err) {
+        console.log("Firebase register error:", err.code, err.message);
+        regError.textContent = translateAuthError(err);
+      }
+    });
+
+    const mainTabs = document.querySelectorAll(".main-tab");
+    const liveTab = document.getElementById("liveTab");
+    const slotTab = document.getElementById("slotTab");
+
+    mainTabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        mainTabs.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        const key = tab.dataset.tab;
+        if (key === "live") {
+          liveTab.style.display = "grid";
+          slotTab.style.display = "none";
+        } else {
+          liveTab.style.display = "none";
+          slotTab.style.display = "grid";
+        }
+      });
+    });
+
+    document.querySelectorAll(".provider-card").forEach(card => {
+      card.addEventListener("click", () => {
+        const url = card.dataset.url;
+        if (url && url !== "#") {
+          window.location.href = url;
+        }
+      });
+    });
+
+    listenAuth(async (user) => {
+      if (!user) {
+        userNameText.textContent = "로그인이 필요합니다";
+        moneyText.textContent = "0원";
+        pointText.textContent = "0원";
+        loginToggleBtn.textContent = "로그인";
+        return;
+      }
+      loginToggleBtn.textContent = "로그아웃";
+
+      const profile = await fetchCurrentUserProfile(user.uid);
+      const nickname = profile?.nickname || user.email;
+      userNameText.textContent = nickname + "님";
+
+      const money = profile?.money ?? 0;
+      const point = profile?.point ?? 0;
+      moneyText.textContent = money.toLocaleString() + "원";
+      pointText.textContent = point.toLocaleString() + "원";
+    });
+  </script>
+</body>
+</html>
