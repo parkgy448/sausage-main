@@ -840,6 +840,7 @@
           phone
         });
         alert("회원가입이 완료되었습니다. 자동으로 로그인됩니다.");
+        alert("관리자 승인 후 모든 서비스를 이용할 수 있습니다.");
         closeModal();
       } catch (err) {
         console.log("Firebase register error:", err.code, err.message);
@@ -885,9 +886,8 @@
     // 쪽지 개수
     async function fetchUnreadMessageCount(uid) {
       const q = query(
-        collection(db, "messages"),
-        where("toUserId", "==", uid),
-        where("isRead", "==", false)
+        collection(db, "userMessages", uid, "messages"),
+        where("read", "==", false)
       );
       const snap = await getDocs(q);
       return snap.size;
@@ -924,6 +924,13 @@
 
       try {
         const profile = await fetchCurrentUserProfile(user.uid);
+        
+        if (profile && profile.status === 'pending') {
+          alert("관리자의 가입 승인을 기다리는 중입니다. 자동으로 로그아웃됩니다.");
+          logoutUser();
+          return;
+        }
+
         const nickname = profile?.nickname || user.email;
         userNameText.textContent = nickname + "님";
 

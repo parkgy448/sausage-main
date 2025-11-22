@@ -681,6 +681,13 @@
 
       try {
         const profile = await fetchCurrentUserProfile(user.uid);
+        
+        if (profile && profile.status === 'pending') {
+          alert("관리자의 가입 승인을 기다리는 중입니다. 자동으로 로그아웃됩니다.");
+          logoutUser();
+          return;
+        }
+
         userNameText.textContent = (profile?.nickname || user.email) + "님";
         moneyText.textContent = (profile?.money ?? 0).toLocaleString();
         pointText.textContent = (profile?.point ?? 0).toLocaleString();

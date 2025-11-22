@@ -707,9 +707,8 @@
     // 쪽지 개수
     async function fetchUnreadMessageCount(uid) {
       const q = query(
-        collection(db, "messages"),
-        where("toUserId", "==", uid),
-        where("isRead", "==", false)
+        collection(db, "userMessages", uid, "messages"),
+        where("read", "==", false)
       );
       const snap = await getDocs(q);
       return snap.size;
@@ -814,12 +813,13 @@
       try {
         await addDoc(collection(db, "exchangeRequests"), {
           userId: currentUserId,
+          nickname: userNameText.textContent.replace('님', ''),
           amount,
           bank,
           account,
           accountName,
           status: "pending",
-          date: new Date().toISOString()
+          timestamp: serverTimestamp()
         });
         alert("환전 신청이 완료되었습니다. 관리자 확인 후 처리됩니다.");
         amountInput.value = '0';
@@ -830,7 +830,7 @@
     });
     
     function loadWithdrawalHistory(userId) {
-      const q = query(collection(db, "exchangeRequests"), where("userId", "==", userId), orderBy("date", "desc"));
+      const q = query(collection(db, "exchangeRequests"), where("userId", "==", userId), orderBy("timestamp", "desc"));
       
       onSnapshot(q, (snapshot) => {
         historyBody.innerHTML = '';
@@ -840,7 +840,7 @@
         }
         snapshot.forEach(doc => {
           const data = doc.data();
-          const date = new Date(data.date);
+          const date = data.timestamp?.toDate();
           const formattedDate = date ? `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}` : '대기중';
           
           let statusText;

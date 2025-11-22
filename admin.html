@@ -6,21 +6,33 @@
     <title>관리자 페이지 | SSS CASINO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        :root {
+            --color-bg: #020617;
+            --color-bg-light: #0f172a;
+            --color-bg-lighter: #1e293b;
+            --color-border: #334155;
+            --color-text: #f9fafb;
+            --color-text-dim: #9ca3af;
+            --color-primary: #f97316;
+            --color-accent: #6366f1;
+            --color-approve: #10b981;
+            --color-reject: #ef4444;
+        }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background-color: #0a0a12;
-            color: white;
+            background-color: var(--color-bg);
+            color: var(--color-text);
         }
         .admin-tab.active {
-            background-color: #f97316;
-            color: white;
+            background-color: var(--color-primary);
+            color: var(--color-text);
+            border-bottom-color: var(--color-primary);
+        }
+        .admin-tab {
+            border-bottom: 2px solid transparent;
         }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .stat-card {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-            border: 1px solid #374151;
-        }
         .admin-action-btn {
             padding: 4px 8px;
             border-radius: 4px;
@@ -28,23 +40,44 @@
             margin: 2px;
             border: none;
             cursor: pointer;
+            transition: all 0.2s ease;
+            background-color: var(--color-border);
         }
-        .admin-action-btn.info { background-color: #3b82f6; color: white; }
-        .admin-action-btn.delete { background-color: #dc2626; color: white; }
-        #userTableBody input, #userTableBody select {
-             background-color: #374151;
-             padding: 4px 6px;
-             border-radius: 4px;
-             border: 1px solid #4b5563;
-             font-size: 12px;
+        .admin-action-btn:hover { filter: brightness(1.2); }
+        .admin-action-btn.info { background-color: var(--color-accent); }
+        .admin-action-btn.approve { background-color: var(--color-approve); }
+        .admin-action-btn.reject { background-color: var(--color-reject); }
+        
+        .styled-input, .styled-textarea, .styled-select {
+             background-color: var(--color-bg-light);
+             padding: 6px 8px;
+             border-radius: 6px;
+             border: 1px solid var(--color-border);
+             font-size: 13px;
+             width: 100%;
         }
-        #accessDenied, #loadingIndicator {
+        .styled-input:focus, .styled-textarea:focus, .styled-select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.5);
+        }
+        .primary-btn {
+            background: linear-gradient(90deg, var(--color-accent), #ec4899);
+            color: var(--color-text);
+            font-weight: 600;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 999px;
+            border: none;
+        }
+        .overlay-screen {
             position: fixed;
             inset: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(10, 10, 18, 0.9);
+            background: rgba(2, 6, 23, 0.9);
+            backdrop-filter: blur(4px);
             z-index: 100;
         }
     </style>
@@ -55,7 +88,7 @@
         <!-- Header -->
         <header class="flex justify-between items-center mb-6">
             <div>
-                <h1 class="text-2xl font-bold text-orange-400">SSS Casino Admin</h1>
+                <h1 class="text-2xl font-bold text-orange-400">SSS CASINO Admin</h1>
                 <div id="adminEmail" class="text-sm text-gray-400"></div>
             </div>
             <a href="index.html" class="text-gray-400 hover:text-white border border-gray-600 rounded-full px-4 py-2 text-sm">메인으로</a>
@@ -63,109 +96,59 @@
 
         <!-- 탭 메뉴 -->
         <div class="flex overflow-x-auto border-b border-gray-700 mb-6">
-            <button class="admin-tab active px-6 py-3 font-bold whitespace-nowrap" data-tab="users">회원 관리</button>
-            <button class="admin-tab px-6 py-3 font-bold whitespace-nowrap" data-tab="messages">쪽지 관리</button>
-            <!-- 다른 탭들은 기능 구현 후 활성화 -->
-            <button class="admin-tab px-6 py-3 font-bold whitespace-nowrap text-gray-500 cursor-not-allowed" disabled>충전 관리</button>
-            <button class="admin-tab px-6 py-3 font-bold whitespace-nowrap text-gray-500 cursor-not-allowed" disabled>환전 관리</button>
+            <button class="admin-tab px-5 py-3 font-bold whitespace-nowrap" data-tab="users">회원 관리</button>
+            <button class="admin-tab px-5 py-3 font-bold whitespace-nowrap" data-tab="approvals">가입 승인</button>
+            <button class="admin-tab px-5 py-3 font-bold whitespace-nowrap" data-tab="messages">쪽지 관리</button>
+            <button class="admin-tab px-5 py-3 font-bold whitespace-nowrap" data-tab="deposits">충전 관리</button>
+            <button class="admin-tab px-5 py-3 font-bold whitespace-nowrap" data-tab="exchanges">환전 관리</button>
+            <button class="admin-tab px-5 py-3 font-bold whitespace-nowrap" data-tab="chats">고객 문의</button>
+            <button class="admin-tab px-5 py-3 font-bold whitespace-nowrap" data-tab="content">콘텐츠 관리</button>
+            <button class="admin-tab px-5 py-3 font-bold whitespace-nowrap" data-tab="account">계좌 설정</button>
         </div>
 
-        <!-- 회원 검색 -->
-        <div class="search-box mb-4">
-            <input type="text" id="userSearch" placeholder="닉네임 또는 이메일로 검색..." 
-                   class="w-full bg-gray-800 rounded-lg p-3 text-sm border border-gray-700">
-        </div>
-
-        <!-- Users Tab -->
-        <div id="usersTab" class="tab-content active">
-            <div class="bg-gray-800/50 rounded-lg overflow-hidden border border-gray-700">
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-gray-700/50">
-                            <tr>
-                                <th class="p-3 text-left text-sm font-semibold">닉네임/이메일</th>
-                                <th class="p-3 text-left text-sm font-semibold">보유머니</th>
-                                <th class="p-3 text-left text-sm font-semibold">포인트</th>
-                                <th class="p-3 text-left text-sm font-semibold">가입일</th>
-                                <th class="p-3 text-left text-sm font-semibold">역할</th>
-                                <th class="p-3 text-left text-sm font-semibold">관리</th>
-                            </tr>
-                        </thead>
-                        <tbody id="userTableBody" class="divide-y divide-gray-700">
-                            <!-- JS로 채워짐 -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Messages Tab -->
-        <div id="messagesTab" class="tab-content">
-             <div class="bg-gray-800/50 rounded-lg p-6 border border-gray-700">
-                <h3 class="font-bold mb-4 text-orange-400">전체 사용자에게 쪽지 보내기</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-1">쪽지 제목</label>
-                        <input type="text" id="messageTitle" class="w-full bg-gray-700 rounded p-2 border border-gray-600" placeholder="쪽지 제목">
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-1">쪽지 내용</label>
-                        <textarea id="messageContent" class="w-full bg-gray-700 rounded p-2 border border-gray-600" rows="5" placeholder="쪽지 내용"></textarea>
-                    </div>
-                    <button id="sendMessageBtn" class="w-full bg-orange-500 hover:bg-orange-600 py-3 rounded-lg font-bold">
-                        전체 발송
-                    </button>
-                </div>
-            </div>
-        </div>
+        <!-- Tab Contents -->
+        <div id="usersTab" class="tab-content"><div class="mb-4"><input type="text" id="userSearch" placeholder="닉네임 또는 이메일로 검색..." class="w-full max-w-sm styled-input"></div><div class="bg-slate-800/50 rounded-lg overflow-hidden border border-slate-700"><div class="overflow-x-auto"><table class="w-full"><thead class="bg-slate-700/50"><tr><th class="p-3 text-left text-sm font-semibold">닉네임/이메일</th><th class="p-3 text-left text-sm font-semibold">보유머니</th><th class="p-3 text-left text-sm font-semibold">포인트</th><th class="p-3 text-left text-sm font-semibold">가입일</th><th class="p-3 text-left text-sm font-semibold">역할/상태</th><th class="p-3 text-left text-sm font-semibold">관리</th></tr></thead><tbody id="userTableBody" class="divide-y divide-slate-700"></tbody></table></div></div></div>
+        <div id="approvalsTab" class="tab-content"><div class="bg-slate-800/50 rounded-lg overflow-hidden border border-slate-700"><div class="overflow-x-auto"><table class="w-full"><thead class="bg-slate-700/50"><tr><th class="p-3 text-left text-sm font-semibold">신청자 (닉네임/이메일)</th><th class="p-3 text-left text-sm font-semibold">가입일</th><th class="p-3 text-left text-sm font-semibold">관리</th></tr></thead><tbody id="approvalsTableBody" class="divide-y divide-slate-700"></tbody></table></div></div></div>
+        <div id="messagesTab" class="tab-content"><div class="bg-slate-800/50 rounded-lg p-6 border border-slate-700 max-w-2xl mx-auto"><h3 class="font-bold mb-4 text-orange-400 text-lg">전체 사용자에게 쪽지 보내기</h3><div class="space-y-4"><div><label class="block text-sm text-gray-400 mb-1">쪽지 제목</label><input type="text" id="messageTitle" class="w-full styled-input" placeholder="중요 공지사항"></div><div><label class="block text-sm text-gray-400 mb-1">쪽지 내용</label><textarea id="messageContent" class="w-full styled-textarea" rows="5" placeholder="내용을 입력하세요..."></textarea></div><button id="sendMessageBtn" class="w-full primary-btn !rounded-md !py-2.5">전체 발송</button></div></div></div>
+        <div id="depositsTab" class="tab-content"><div class="bg-slate-800/50 rounded-lg overflow-hidden border border-slate-700"><div class="overflow-x-auto"><table class="w-full"><thead class="bg-slate-700/50"><tr><th class="p-3 text-left text-sm font-semibold">신청자 (닉네임)</th><th class="p-3 text-left text-sm font-semibold">신청금액</th><th class="p-3 text-left text-sm font-semibold">신청일</th><th class="p-3 text-left text-sm font-semibold">관리</th></tr></thead><tbody id="depositTableBody" class="divide-y divide-slate-700"></tbody></table></div></div></div>
+        <div id="exchangesTab" class="tab-content"><div class="bg-slate-800/50 rounded-lg overflow-hidden border border-slate-700"><div class="overflow-x-auto"><table class="w-full"><thead class="bg-slate-700/50"><tr><th class="p-3 text-left text-sm font-semibold">신청자 (닉네임)</th><th class="p-3 text-left text-sm font-semibold">신청금액</th><th class="p-3 text-left text-sm font-semibold">은행/계좌/예금주</th><th class="p-3 text-left text-sm font-semibold">신청일</th><th class="p-3 text-left text-sm font-semibold">관리</th></tr></thead><tbody id="exchangeTableBody" class="divide-y divide-slate-700"></tbody></table></div></div></div>
+        <div id="chatsTab" class="tab-content"><div class="flex h-[60vh] bg-slate-800/50 rounded-lg border border-slate-700"><div class="w-1/3 border-r border-slate-700 flex flex-col"><div class="p-3 border-b border-slate-700 font-bold">채팅 목록</div><div id="chatListContainer" class="overflow-y-auto flex-1"></div></div><div id="chatWindowContainer" class="w-2/3 flex-col hidden" style="display: none;"></div></div></div>
+        <div id="contentTab" class="tab-content"><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div class="bg-slate-800/50 rounded-lg p-6 border border-slate-700"><h3 class="font-bold mb-4 text-orange-400 text-lg">새 콘텐츠 추가</h3><div class="space-y-4"><div><label class="block text-sm text-gray-400 mb-1">타입</label><select id="newContentType" class="w-full styled-select"><option value="announcements">공지사항</option><option value="events">이벤트</option></select></div><div><label class="block text-sm text-gray-400 mb-1">제목</label><input type="text" id="newContentTitle" class="w-full styled-input" placeholder="새 공지사항 제목"></div><div><label class="block text-sm text-gray-400 mb-1">내용 (선택사항)</label><textarea id="newContentBody" class="w-full styled-textarea" rows="4" placeholder="상세 내용을 입력하세요..."></textarea></div><button id="addContentBtn" class="w-full primary-btn !rounded-md !py-2.5">추가</button></div></div><div class="bg-slate-800/50 rounded-lg p-6 border border-slate-700"><h3 class="font-bold mb-4 text-orange-400 text-lg">기존 콘텐츠 목록</h3><div id="contentListContainer" class="space-y-3 max-h-[60vh] overflow-y-auto"></div></div></div></div>
+        <div id="accountTab" class="tab-content"><div class="bg-slate-800/50 rounded-lg p-6 border border-slate-700 max-w-2xl mx-auto"><h3 class="font-bold mb-4 text-orange-400 text-lg">입금 계좌 설정</h3><p class="text-sm text-gray-400 mb-4">계좌 정보를 저장하면 모든 사용자에게 변경 안내 쪽지가 자동으로 발송됩니다.</p><div class="space-y-4"><div><label class="block text-sm text-gray-400 mb-1">은행명</label><input type="text" id="accountBank" class="w-full styled-input" placeholder="예) 국민은행"></div><div><label class="block text-sm text-gray-400 mb-1">계좌번호</label><input type="text" id="accountNumber" class="w-full styled-input" placeholder="'-' 없이 숫자만 입력"></div><div><label class="block text-sm text-gray-400 mb-1">예금주</label><input type="text" id="accountHolder" class="w-full styled-input" placeholder="예) 홍길동"></div><button id="saveAccountBtn" class="w-full primary-btn !rounded-md !py-2.5">계좌 정보 저장 및 전체 쪽지 발송</button></div></div></div>
     </div>
     
-    <div id="accessDenied">
-        <div class="text-center">
-            <h2 class="text-2xl font-bold text-red-500">액세스 거부됨</h2>
-            <p class="text-gray-400 mt-2">관리자만 이 페이지에 접근할 수 있습니다. 5초 후 메인 페이지로 이동합니다.</p>
-        </div>
-    </div>
-
-    <div id="loadingIndicator" class="hidden">
-         <div class="text-center">
-            <h2 class="text-2xl font-bold text-orange-500">데이터 로딩 중...</h2>
-        </div>
-    </div>
+    <div id="accessDenied" class="overlay-screen hidden"><div class="text-center p-4"><h2 class="text-2xl font-bold text-red-500">액세스 거부됨</h2><p class="text-gray-400 mt-2">관리자만 이 페이지에 접근할 수 있습니다. 3초 후 메인 페이지로 이동합니다.</p></div></div>
+    <div id="loadingIndicator" class="overlay-screen hidden"><div class="text-center"><svg class="animate-spin h-8 w-8 text-orange-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><h2 class="text-xl font-bold text-orange-500 mt-4">처리 중...</h2></div></div>
 
     <script type="module">
         import { auth, db } from "./js/firebase-config.js";
-        import { listenAuth, fetchCurrentUserProfile } from "./js/auth-utils.js";
-        import { collection, getDocs, doc, getDoc, updateDoc, deleteDoc, writeBatch, serverTimestamp, query } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import { listenAuth } from "./js/auth-utils.js";
+        import { collection, getDocs, getDoc, doc, updateDoc, deleteDoc, setDoc, writeBatch, serverTimestamp, query, where, orderBy, runTransaction, onSnapshot, addDoc, increment } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-        const adminPanel = document.getElementById('adminPanel');
-        const accessDenied = document.getElementById('accessDenied');
-        const loadingIndicator = document.getElementById('loadingIndicator');
-        const adminEmailEl = document.getElementById('adminEmail');
-        const userTableBody = document.getElementById('userTableBody');
-        const userSearch = document.getElementById('userSearch');
+        // --- DOM Elements ---
+        const getEl = (id) => document.getElementById(id);
+        const adminPanel = getEl('adminPanel'), accessDenied = getEl('accessDenied'), loadingIndicator = getEl('loadingIndicator'), adminEmailEl = getEl('adminEmail');
+        
+        // --- Caches ---
+        let allUsersCache = new Map();
+        
+        // --- Real-time listeners ---
+        let listeners = [];
 
-        let allUsers = []; // 전체 사용자 목록을 캐시
-
-        // 1. 관리자 인증 확인
+        // --- Initialization & Auth ---
         listenAuth(async (user) => {
             if (user) {
-                const profile = await fetchCurrentUserProfile(user.uid);
-                if (profile && profile.role === 'admin') {
-                    // 관리자일 경우
-                    loadingIndicator.classList.remove('hidden');
-                    accessDenied.classList.add('hidden');
-                    adminEmailEl.textContent = user.email;
-                    await loadAllUsers(); // 모든 사용자 데이터 로드
-                    renderUserTable(); // 테이블 렌더링
-                    adminPanel.classList.remove('hidden');
-                    loadingIndicator.classList.add('hidden');
-                } else {
-                    // 관리자가 아닐 경우
+                try {
+                    const profileSnap = await getDoc(doc(db, "users", user.uid));
+                    if (profileSnap.exists() && profileSnap.data().role === 'admin') {
+                        await initializeAdminPanel(user);
+                    } else {
+                        showAccessDenied();
+                    }
+                } catch (e) {
                     showAccessDenied();
                 }
             } else {
-                // 로그인하지 않았을 경우
                 showAccessDenied();
             }
         });
@@ -173,192 +156,440 @@
         function showAccessDenied() {
             adminPanel.classList.add('hidden');
             accessDenied.classList.remove('hidden');
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 5000);
+            setTimeout(() => { window.location.href = 'index.html'; }, 3000);
         }
-        
-        // 2. 모든 사용자 데이터 로드
+
+        async function initializeAdminPanel(user) {
+            loadingIndicator.classList.remove('hidden');
+            adminEmailEl.textContent = user.email;
+            await loadAllUsers();
+            
+            const featureSetups = {
+                'users': setupUserManagement, 'approvals': setupApprovalManagement, 'messages': setupMessageManagement,
+                'deposits': setupDepositManagement, 'exchanges': setupExchangeManagement, 'chats': setupChatManagement,
+                'content': setupContentManagement, 'account': setupAccountManagement
+            };
+            Object.values(featureSetups).forEach(setup => setup());
+            
+            setupTabs();
+            // Activate users tab by default
+            const usersTabButton = document.querySelector('.admin-tab[data-tab="users"]');
+            if (usersTabButton) {
+                usersTabButton.classList.add('active');
+                getEl('usersTab').classList.add('active');
+                renderUserTable();
+            }
+
+            adminPanel.classList.remove('hidden');
+            loadingIndicator.classList.add('hidden');
+        }
+
         async function loadAllUsers() {
             try {
                 const usersSnapshot = await getDocs(collection(db, "users"));
-                allUsers = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            } catch (error) {
-                console.error("Error loading users:", error);
-                alert('사용자 목록을 불러오는 데 실패했습니다.');
+                allUsersCache.clear();
+                usersSnapshot.docs.forEach(doc => allUsersCache.set(doc.id, { id: doc.id, ...doc.data() }));
+            } catch (e) {
+                alert('사용자 목록 로딩 실패: Firestore 보안 규칙을 확인하세요.');
             }
         }
         
-        // 3. 사용자 테이블 렌더링
-        function renderUserTable() {
-            userTableBody.innerHTML = ""; // 테이블 비우기
+        function setupTabs() {
+            document.querySelectorAll('.admin-tab').forEach(tab => {
+                tab.addEventListener('click', async function() {
+                    if (this.disabled) return;
+                    listeners.forEach(unsub => unsub());
+                    listeners = [];
+
+                    document.querySelectorAll('.admin-tab, .tab-content').forEach(el => el.classList.remove('active'));
+                    this.classList.add('active');
+                    const tabName = this.dataset.tab;
+                    getEl(tabName + 'Tab').classList.add('active');
+                    
+                    const loadAction = {
+                        'users': renderUserTable, 'approvals': loadAndRenderPendingUsers,
+                        'deposits': loadAndRenderDeposits, 'exchanges': loadAndRenderExchanges,
+                        'chats': loadActiveChats, 'content': loadContentItems, 'account': loadAccountInfo,
+                    };
+                    if(loadAction[tabName]) await loadAction[tabName]();
+                });
+            });
+        }
+        
+        const renderTable = (tbodyId, items, renderRow, noDataHtml) => {
+            const tbody = getEl(tbodyId);
+            tbody.innerHTML = items.length > 0 ? items.map(renderRow).join('') : noDataHtml;
+        };
+
+        const withLoading = async (func) => {
+            loadingIndicator.classList.remove('hidden');
+            try { await func(); } 
+            catch (e) { alert(`오류 발생: ${e.message}`); } 
+            finally { loadingIndicator.classList.add('hidden'); }
+        };
+
+        // --- Features ---
+        function setupUserManagement() {
+            getEl('userSearch').addEventListener('input', () => renderUserTable());
+            const userTableBody = getEl('userTableBody');
             
-            const searchTerm = userSearch.value.toLowerCase();
-            const filteredUsers = allUsers.filter(user => {
-                const nickname = user.nickname?.toLowerCase() || '';
-                const email = user.email?.toLowerCase() || '';
-                return nickname.includes(searchTerm) || email.includes(searchTerm);
-            });
+            userTableBody.addEventListener('change', async (e) => {
+                const target = e.target;
+                const id = target.dataset.id;
+                if (!id || !target.dataset.field) return;
 
-            if (filteredUsers.length === 0) {
-                userTableBody.innerHTML = `<tr><td colspan="6" class="text-center p-4 text-gray-500">표시할 사용자가 없습니다.</td></tr>`;
-                return;
-            }
-
-            filteredUsers.forEach(user => {
-                const tr = document.createElement('tr');
-                const joinDate = user.createdAt?.toDate()?.toLocaleDateString() || '알 수 없음';
-
-                tr.innerHTML = `
-                    <td class="p-3">
-                        <div class="font-medium">${user.nickname || 'N/A'}</div>
-                        <div class="text-xs text-gray-400">${user.email}</div>
-                    </td>
-                    <td class="p-3">
-                        <input type="number" value="${user.money || 0}" data-id="${user.id}" data-field="money" class="w-24"> 원
-                    </td>
-                    <td class="p-3">
-                        <input type="number" value="${user.point || 0}" data-id="${user.id}" data-field="point" class="w-24"> P
-                    </td>
-                    <td class="p-3 text-sm">${joinDate}</td>
-                    <td class="p-3">
-                        <select data-id="${user.id}" data-field="role" class="w-24">
-                            <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
-                            <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
-                        </select>
-                    </td>
-                    <td class="p-3">
-                        <button class="admin-action-btn delete" data-id="${user.id}" data-nickname="${user.nickname}">삭제</button>
-                    </td>
-                `;
-                userTableBody.appendChild(tr);
-            });
-        }
-        
-        // 4. 이벤트 리스너 바인딩
-        userSearch.addEventListener('input', () => renderUserTable());
-
-        userTableBody.addEventListener('change', async (e) => {
-            const target = e.target;
-            const id = target.dataset.id;
-            if (!id) return;
-
-            const field = target.dataset.field;
-            let value = target.value;
-
-            if (target.type === 'number') {
-                value = Number(value);
-                if (isNaN(value) || value < 0) {
+                const field = target.dataset.field;
+                let value = target.type === 'number' ? Number(target.value) : target.value;
+                if (target.type === 'number' && (isNaN(value) || value < 0)) {
                     alert('유효한 숫자를 입력하세요.');
-                    // 원래 값으로 되돌리는 로직 추가 가능
+                    target.value = allUsersCache.get(id)[field];
                     return;
                 }
-            }
-            
-            try {
-                loadingIndicator.classList.remove('hidden');
-                const userDocRef = doc(db, "users", id);
-                await updateDoc(userDocRef, { [field]: value });
-                // 로컬 캐시 업데이트
-                const userInCache = allUsers.find(u => u.id === id);
-                if(userInCache) userInCache[field] = value;
-            } catch (error) {
-                console.error(`Error updating user ${field}:`, error);
-                alert('업데이트에 실패했습니다.');
-            } finally {
-                loadingIndicator.classList.add('hidden');
-            }
-        });
-        
-        userTableBody.addEventListener('click', async (e) => {
-            if (e.target.classList.contains('delete')) {
-                const id = e.target.dataset.id;
-                const nickname = e.target.dataset.nickname;
-                if (confirm(`정말로 '${nickname}' 사용자를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`)) {
-                     try {
-                        loadingIndicator.classList.remove('hidden');
-                        await deleteDoc(doc(db, "users", id));
-                        allUsers = allUsers.filter(u => u.id !== id);
-                        renderUserTable();
-                        alert('사용자가 삭제되었습니다.');
-                    } catch (error) {
-                        console.error("Error deleting user:", error);
-                        alert('사용자 삭제에 실패했습니다.');
-                    } finally {
-                        loadingIndicator.classList.add('hidden');
+                await withLoading(async () => {
+                    await updateDoc(doc(db, "users", id), { [field]: value });
+                    allUsersCache.get(id)[field] = value;
+                });
+            });
+
+            userTableBody.addEventListener('click', async (e) => {
+                if (e.target.classList.contains('delete')) {
+                    const id = e.target.dataset.id;
+                    if (confirm(`'${allUsersCache.get(id)?.nickname}' 사용자를 삭제하시겠습니까?`)) {
+                        await withLoading(async () => {
+                            await deleteDoc(doc(db, "users", id));
+                            allUsersCache.delete(id);
+                            renderUserTable();
+                        });
                     }
                 }
-            }
-        });
-
-        // 탭 기능
-        document.querySelectorAll('.admin-tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                if(this.disabled) return;
-                
-                document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
-                this.classList.add('active');
-                const tabName = this.dataset.tab;
-                document.getElementById(tabName + 'Tab').classList.add('active');
             });
-        });
+        }
 
-        // 쪽지 발송 기능
-        const sendMessageBtn = document.getElementById('sendMessageBtn');
-        sendMessageBtn.addEventListener('click', async () => {
-            const title = document.getElementById('messageTitle').value;
-            const content = document.getElementById('messageContent').value;
+        function renderUserTable() {
+            const searchTerm = getEl('userSearch').value.toLowerCase();
+            const usersToRender = Array.from(allUsersCache.values()).filter(user => (user.nickname?.toLowerCase() || '').includes(searchTerm) || (user.email?.toLowerCase() || '').includes(searchTerm));
+            
+            renderTable('userTableBody', usersToRender, user => `
+                <tr>
+                    <td class="p-3"><div class="font-medium">${user.nickname||'N/A'}</div><div class="text-xs text-gray-400">${user.email}</div></td>
+                    <td class="p-3"><input type="number" value="${user.money||0}" data-id="${user.id}" data-field="money" class="w-28 styled-input"> 원</td>
+                    <td class="p-3"><input type="number" value="${user.point||0}" data-id="${user.id}" data-field="point" class="w-24 styled-input"> P</td>
+                    <td class="p-3 text-sm">${user.createdAt?.toDate?.().toLocaleDateString()||'알 수 없음'}</td>
+                    <td class="p-3">
+                        <select data-id="${user.id}" data-field="role" class="w-24 mb-1 styled-select"><option value="user" ${user.role==='user'?'selected':''}>User</option><option value="admin" ${user.role==='admin'?'selected':''}>Admin</option></select>
+                        <select data-id="${user.id}" data-field="status" class="w-24 styled-select"><option value="active" ${user.status==='active'?'selected':''}>Active</option><option value="pending" ${user.status==='pending'?'selected':''}>Pending</option></select>
+                    </td>
+                    <td class="p-3"><button class="admin-action-btn reject delete" data-id="${user.id}">삭제</button></td>
+                </tr>
+            `, `<tr><td colspan="6" class="text-center p-5 text-gray-500">표시할 사용자가 없습니다.</td></tr>`);
+        }
 
-            if (!title.trim() || !content.trim()) {
-                alert('제목과 내용을 모두 입력해주세요.');
-                return;
-            }
+        async function loadAndRenderPendingUsers() {
+            const q = query(collection(db, "users"), where("status", "==", "pending"));
+            const snapshot = await getDocs(q);
+            const pendingUsers = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+            renderTable('approvalsTableBody', pendingUsers, user => `
+                <tr>
+                    <td class="p-3"><div class="font-medium">${user.nickname||'N/A'}</div><div class="text-xs text-gray-400">${user.email}</div></td>
+                    <td class="p-3 text-sm">${user.createdAt?.toDate?.().toLocaleDateString()||'알 수 없음'}</td>
+                    <td class="p-3"><button class="admin-action-btn approve" data-id="${user.id}">승인</button><button class="admin-action-btn reject" data-id="${user.id}">거절</button></td>
+                </tr>
+            `, `<tr><td colspan="3" class="text-center p-5 text-gray-500">승인 대기 중인 사용자가 없습니다.</td></tr>`);
+        }
 
-            if (!confirm('정말로 모든 사용자에게 이 쪽지를 발송하시겠습니까?')) {
-                return;
-            }
+        function setupApprovalManagement() {
+            getEl('approvalsTableBody').addEventListener('click', async e => {
+                const button = e.target;
+                const userId = button.dataset.id;
+                if (!userId) return;
+                const isApprove = button.classList.contains('approve');
+                const actionText = isApprove ? '승인' : '거절';
+                
+                if (!confirm(`이 사용자의 가입을 ${actionText}하시겠습니까?`)) return;
 
-            loadingIndicator.classList.remove('hidden');
-            try {
-                // 1. 모든 사용자 문서를 가져옵니다.
-                const usersSnapshot = await getDocs(query(collection(db, "users")));
-                if (usersSnapshot.empty) {
-                    alert("쪽지를 보낼 사용자가 없습니다.");
-                    return;
-                }
-
-                // 2. Batch 쓰기를 준비합니다.
-                const batch = writeBatch(db);
-                const messageData = {
-                    title: title,
-                    content: content,
-                    read: false,
-                    timestamp: serverTimestamp()
-                };
-
-                usersSnapshot.forEach(userDoc => {
-                    // 각 사용자의 messages 서브컬렉션에 새 쪽지 문서를 추가합니다.
-                    const messageRef = doc(collection(db, "userMessages", userDoc.id, "messages"));
-                    batch.set(messageRef, messageData);
+                await withLoading(async () => {
+                    if (isApprove) {
+                        await updateDoc(doc(db, "users", userId), { status: 'active' });
+                        if(allUsersCache.has(userId)) allUsersCache.get(userId).status = 'active';
+                    } else {
+                        await deleteDoc(doc(db, "users", userId));
+                        allUsersCache.delete(userId);
+                    }
+                    alert(`가입 요청이 ${actionText} 처리되었습니다.`);
+                    await loadAndRenderPendingUsers(); 
                 });
+            });
+        }
 
-                // 3. Batch 쓰기를 실행합니다.
+        function setupMessageManagement() {
+            getEl('sendMessageBtn').addEventListener('click', async () => {
+                const title = getEl('messageTitle').value;
+                const content = getEl('messageContent').value;
+                if (!title.trim() || !content.trim()) return alert('제목과 내용을 모두 입력해주세요.');
+                if (confirm('모든 사용자에게 이 쪽지를 발송하시겠습니까?')) {
+                    await withLoading(async () => {
+                        const batch = writeBatch(db);
+                        allUsersCache.forEach(user => batch.set(doc(collection(db, "userMessages", user.id, "messages")), { title, content, read: false, timestamp: serverTimestamp() }));
+                        await batch.commit();
+                        alert(`${allUsersCache.size}명의 모든 사용자에게 쪽지를 성공적으로 발송했습니다.`);
+                        getEl('messageTitle').value = '';
+                        getEl('messageContent').value = '';
+                    });
+                }
+            });
+        }
+
+        function setupRequestManagement(tbodyId, collectionName, renderFn) {
+             getEl(tbodyId).addEventListener('click', async e => {
+                const button = e.target;
+                const reqId = button.dataset.id;
+                if (!reqId) return;
+
+                const isApprove = button.classList.contains('approve');
+                const actionText = isApprove ? (collectionName === 'exchangeRequests' ? '완료' : '승인') : '거절';
+                
+                if (!confirm(`요청을 ${actionText}하시겠습니까?`)) return;
+
+                await withLoading(async () => {
+                    const reqRef = doc(db, collectionName, reqId);
+                    const reqDoc = await getDoc(reqRef);
+                    if (!reqDoc.exists()) throw new Error("Request not found");
+                    const reqData = reqDoc.data();
+                    
+                    if (isApprove) {
+                        if (collectionName === 'depositRequests') {
+                            const userRef = doc(db, "users", reqData.userId);
+                            await runTransaction(db, async (t) => {
+                                const userDoc = await t.get(userRef);
+                                if (!userDoc.exists()) throw new Error("User not found");
+                                const newMoney = (userDoc.data().money || 0) + reqData.amount;
+                                t.update(userRef, { money: newMoney });
+                                t.update(reqRef, { status: 'approved' });
+                            });
+                        } else { // Exchange
+                            await updateDoc(reqRef, { status: 'completed' });
+                        }
+                    } else { // Reject
+                        if (collectionName === 'exchangeRequests') {
+                             const userRef = doc(db, "users", reqData.userId);
+                             await runTransaction(db, async (t) => {
+                                const userDoc = await t.get(userRef);
+                                if (!userDoc.exists()) throw new Error("User not found");
+                                const newMoney = (userDoc.data().money || 0) + reqData.amount;
+                                t.update(userRef, { money: newMoney });
+                                t.update(reqRef, { status: 'rejected' });
+                            });
+                        } else { // Deposit
+                            await updateDoc(reqRef, { status: 'rejected' });
+                        }
+                    }
+                    alert(`요청이 ${actionText} 처리되었습니다.`);
+                    await renderFn();
+                });
+            });
+        }
+
+        async function loadAndRenderDeposits() {
+            const q = query(collection(db, "depositRequests"), orderBy("timestamp", "desc"));
+            const snapshot = await getDocs(q);
+            const requests = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
+            renderTable('depositTableBody', requests, req => `
+                <tr>
+                    <td class="p-3">${allUsersCache.get(req.userId)?.nickname || '알 수 없음'} (${req.depositorName})</td>
+                    <td class="p-3 font-mono">${(req.amount || 0).toLocaleString()} 원</td>
+                    <td class="p-3 text-sm">${req.timestamp?.toDate?.().toLocaleString('ko-KR') || ''}</td>
+                    <td class="p-3">
+                        ${req.status === 'approved' ? '<span class="text-green-400">승인됨</span>' : req.status === 'rejected' ? '<span class="text-red-400">거절됨</span>' : '<button class="admin-action-btn approve" data-id="'+req.id+'">승인</button><button class="admin-action-btn reject" data-id="'+req.id+'">거절</button>'}
+                    </td>
+                </tr>
+            `, `<tr><td colspan="4" class="text-center p-5 text-gray-500">대기 중인 충전 요청이 없습니다.</td></tr>`);
+        }
+        function setupDepositManagement(){ setupRequestManagement('depositTableBody', 'depositRequests', loadAndRenderDeposits); }
+
+        async function loadAndRenderExchanges() {
+            const q = query(collection(db, "exchangeRequests"), orderBy("timestamp", "desc"));
+            const snapshot = await getDocs(q);
+            const requests = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
+            renderTable('exchangeTableBody', requests, req => `
+                <tr>
+                    <td class="p-3">${allUsersCache.get(req.userId)?.nickname || '알 수 없음'}</td>
+                    <td class="p-3 font-mono">${(req.amount || 0).toLocaleString()} 원</td>
+                    <td class="p-3 text-sm">${allUsersCache.get(req.userId)?.bank || ''} ${allUsersCache.get(req.userId)?.accountNumber || ''}</td>
+                    <td class="p-3 text-sm">${req.timestamp?.toDate?.().toLocaleString('ko-KR') || ''}</td>
+                    <td class="p-3">
+                        ${req.status === 'completed' ? '<span class="text-green-400">완료됨</span>' : req.status === 'rejected' ? '<span class="text-red-400">거절됨</span>' : '<button class="admin-action-btn approve" data-id="'+req.id+'">완료</button><button class="admin-action-btn reject" data-id="'+req.id+'">거절</button>'}
+                    </td>
+                </tr>
+            `, `<tr><td colspan="5" class="text-center p-5 text-gray-500">대기 중인 환전 요청이 없습니다.</td></tr>`);
+        }
+        function setupExchangeManagement(){ setupRequestManagement('exchangeTableBody', 'exchangeRequests', loadAndRenderExchanges); }
+
+        function setupChatManagement() {
+            getEl('chatListContainer').addEventListener('click', (e) => {
+                const chatItem = e.target.closest('.chat-item');
+                if (chatItem) {
+                    openChatWindow(chatItem.dataset.userId, chatItem.dataset.userName);
+                }
+            });
+        }
+        
+        function loadActiveChats() {
+            const q = query(collection(db, "supportChats"), orderBy("updatedAt", "desc"));
+            listeners.push(onSnapshot(q, (snapshot) => {
+                renderTable('chatListContainer', snapshot.docs, doc => {
+                    const chat = doc.data();
+                    return `<div class="chat-item p-3 border-b border-slate-700 cursor-pointer hover:bg-slate-700/50" data-user-id="${chat.userId}" data-user-name="${chat.userName}">
+                        <div class="flex justify-between items-center"><span class="font-bold">${chat.userName}</span>${chat.unreadByAdmin > 0 ? `<span class="bg-red-500 text-white text-xs rounded-full px-2 py-1">${chat.unreadByAdmin}</span>` : ''}</div>
+                        <p class="text-sm text-gray-400 truncate">${chat.lastMessage || '...'}</p>
+                    </div>`;
+                }, `<p class="p-4 text-center text-gray-500">활성 채팅이 없습니다.</p>`);
+            }));
+        }
+        
+        function openChatWindow(userId, userName) {
+            const chatWindowContainer = getEl('chatWindowContainer');
+            chatWindowContainer.style.display = 'flex';
+            chatWindowContainer.innerHTML = `
+                <div class="p-3 border-b border-slate-700 font-bold flex items-center justify-between"><span>${userName}</span></div>
+                <div id="messagesContainer" class="flex-1 p-4 overflow-y-auto"></div>
+                <div class="p-2 border-t border-slate-700"><textarea id="chatInput" class="w-full styled-textarea" rows="2" placeholder="메시지를 입력하세요..."></textarea><button id="sendChatBtn" class="w-full primary-btn !rounded-md !py-2 mt-2">전송</button></div>
+            `;
+            
+            getEl('sendChatBtn').onclick = () => sendAdminMessage(userId);
+            getEl('chatInput').onkeypress = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAdminMessage(userId); } };
+            
+            listeners.push(onSnapshot(query(collection(db, "supportChats", userId, "messages"), orderBy("timestamp", "asc")), (snapshot) => {
+                const messagesContainer = getEl('messagesContainer');
+                if(!messagesContainer) return;
+                renderTable('messagesContainer', snapshot.docs, doc => {
+                    const msg = doc.data();
+                    return `<div class="flex mb-2 ${msg.sender === 'admin' ? 'justify-end' : 'justify-start'}">
+                        <div class="p-2 rounded-lg max-w-xs ${msg.sender === 'admin' ? 'bg-indigo-500' : 'bg-slate-600'}">
+                            ${msg.text.replace(/\n/g, '<br>')}
+                            <div class="text-xs text-right opacity-70 mt-1">${msg.timestamp?.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) || ''}</div>
+                        </div></div>`;
+                }, '');
+                if(messagesContainer) messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }));
+            updateDoc(doc(db, "supportChats", userId), { unreadByAdmin: 0 });
+        }
+        
+        async function sendAdminMessage(userId) {
+            const input = getEl('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+            input.value = '';
+
+            await addDoc(collection(db, "supportChats", userId, "messages"), { text, sender: 'admin', timestamp: serverTimestamp() });
+            await updateDoc(doc(db, "supportChats", userId), { lastMessage: text, updatedAt: serverTimestamp(), unreadByUser: increment(1) });
+        }
+
+        function setupContentManagement() {
+            getEl('addContentBtn').addEventListener('click', () => withLoading(async () => {
+                const type = getEl('newContentType').value;
+                const title = getEl('newContentTitle').value.trim();
+                const body = getEl('newContentBody').value.trim();
+                if (!title) return alert('제목을 입력하세요.');
+                await addDoc(collection(db, type), { title, body, active: true, createdAt: serverTimestamp() });
+                getEl('newContentTitle').value = '';
+                getEl('newContentBody').value = '';
+            }));
+
+            getEl('contentListContainer').addEventListener('click', async e => {
+                const button = e.target;
+                const id = button.dataset.id;
+                const type = button.dataset.type;
+                if (!id || !type) return;
+
+                if (button.classList.contains('save')) {
+                    await withLoading(async () => {
+                        const itemEl = button.closest('.content-item');
+                        const data = {
+                            title: itemEl.querySelector('input[data-field="title"]').value,
+                            body: itemEl.querySelector('textarea[data-field="body"]').value,
+                            active: itemEl.querySelector('input[data-field="active"]').checked
+                        };
+                        await updateDoc(doc(db, type, id), data);
+                        alert('저장되었습니다.');
+                    });
+                } else if (button.classList.contains('delete')) {
+                    if (confirm('정말로 이 항목을 삭제하시겠습니까?')) {
+                        await withLoading(() => deleteDoc(doc(db, type, id)));
+                    }
+                }
+            });
+        }
+
+        function loadContentItems() {
+            const container = getEl('contentListContainer');
+            container.innerHTML = '';
+            
+            const render = (docs, type) => {
+                docs.forEach(d => {
+                    const id = d.id, data = d.data();
+                    let itemEl = getEl(`content-${id}`);
+                    if (!itemEl) {
+                        itemEl = document.createElement('div');
+                        itemEl.id = `content-${id}`;
+                        itemEl.className = 'content-item bg-slate-900/50 p-3 rounded-md border border-slate-700';
+                        container.appendChild(itemEl);
+                    }
+                    itemEl.innerHTML = `
+                        <div class="text-xs text-orange-400 font-bold mb-2">${type === 'announcements' ? '공지사항' : '이벤트'}</div>
+                        <input data-field="title" class="w-full styled-input mb-2" value="${data.title || ''}">
+                        <textarea data-field="body" class="w-full styled-textarea" rows="3">${data.body || ''}</textarea>
+                        <div class="flex justify-between items-center mt-2">
+                            <label class="text-sm flex items-center gap-2"><input type="checkbox" data-field="active" ${data.active !== false ? 'checked' : ''}> 활성</label>
+                            <div><button data-id="${id}" data-type="${type}" class="admin-action-btn info save">저장</button><button data-id="${id}" data-type="${type}" class="admin-action-btn reject delete">삭제</button></div>
+                        </div>`;
+                });
+            };
+
+            ['announcements', 'events'].forEach(type => {
+                listeners.push(onSnapshot(query(collection(db, type), orderBy('createdAt', 'desc')), snap => {
+                    snap.docChanges().forEach(change => {
+                        if (change.type === "removed") getEl(`content-${change.doc.id}`)?.remove();
+                    });
+                    render(snap.docs, type);
+                }));
+            });
+        }
+
+        function setupAccountManagement() {
+            getEl('saveAccountBtn').addEventListener('click', () => withLoading(async () => {
+                const data = {
+                    bank: getEl('accountBank').value.trim(),
+                    number: getEl('accountNumber').value.trim(),
+                    holder: getEl('accountHolder').value.trim(),
+                };
+                if (!data.bank || !data.number || !data.holder) return alert('모든 필드를 입력해주세요.');
+                if (!confirm('계좌 정보를 저장하고 모든 사용자에게 쪽지를 발송하시겠습니까?')) return;
+
+                await setDoc(doc(db, "config", "depositAccount"), data);
+                
+                const title = "입금 계좌 변경 안내";
+                const content = `새로운 입금 계좌로 변경되었습니다.\n은행: ${data.bank}\n계좌번호: ${data.number}\n예금주: ${data.holder}`;
+                const batch = writeBatch(db);
+                allUsersCache.forEach(user => {
+                    const msgRef = doc(collection(db, "userMessages", user.id, "messages"));
+                    batch.set(msgRef, { title, content, read: false, timestamp: serverTimestamp() });
+                });
                 await batch.commit();
 
-                alert(`${usersSnapshot.size}명의 모든 사용자에게 쪽지를 성공적으로 발송했습니다.`);
-                document.getElementById('messageTitle').value = '';
-                document.getElementById('messageContent').value = '';
-
-            } catch (error) {
-                console.error("전체 쪽지 발송 오류: ", error);
-                alert(`쪽지 발송 중 오류가 발생했습니다: ${error.message}`);
-            } finally {
-                loadingIndicator.classList.add('hidden');
-            }
-        });
-
+                alert('계좌 정보가 저장되고, 모든 사용자에게 안내 쪽지를 발송했습니다.');
+            }));
+        }
+        
+        function loadAccountInfo() {
+            listeners.push(onSnapshot(doc(db, "config", "depositAccount"), (d) => {
+                if (d.exists()) {
+                    const { bank, number, holder } = d.data();
+                    getEl('accountBank').value = bank || '';
+                    getEl('accountNumber').value = number || '';
+                    getEl('accountHolder').value = holder || '';
+                }
+            }));
+        }
     </script>
 </body>
 </html>
