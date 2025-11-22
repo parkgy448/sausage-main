@@ -12,13 +12,13 @@
       color: #f9fafb;
       min-height: 100vh;
       background: radial-gradient(circle at top, #1f2937 0, #020617 55%, #000000 100%);
+      display: flex;
+      flex-direction: column;
     }
-    .main-container {
-      max-width: 640px;
-      margin: 0 auto;
-      padding: 16px;
-    }
-    .header {
+    a { color: inherit; text-decoration: none; }
+
+    /* 상단바 */
+    .top-bar {
       background: #050814;
       padding: 10px 16px;
       display: flex;
@@ -26,15 +26,60 @@
       justify-content: space-between;
       border-bottom: 1px solid rgba(148, 163, 184, 0.2);
     }
-    .user-info {
-      font-size: 14px;
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 18px;
     }
-    .user-info .logout-btn {
-      background-color: #4b5563;
+    .logo-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: radial-gradient(circle at 20% 20%, #facc15, #ea580c);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 800;
+      color: #111827;
+    }
+    .user-info {
+      text-align: right;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .user-name-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .login-btn {
       padding: 4px 10px;
       border-radius: 999px;
+      border: none;
+      background: #6366f1;
+      color: #f9fafb;
       font-size: 12px;
-      margin-left: 8px;
+      cursor: pointer;
+    }
+    .admin-btn {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: none;
+      background: #f97316;
+      color: #111827;
+      font-size: 12px;
+      cursor: pointer;
+      display: none; /* 기본 숨김 */
+    }
+
+    .main-content-area {
+      flex: 1;
+      padding: 16px;
+      padding-bottom: 96px; /* Adjust for fixed bottom nav */
     }
     .form-section {
       margin-top: 20px;
@@ -137,6 +182,80 @@
     .bottom-label { margin-top: 1px; }
     .bottom-item.active { color: #f97316; }
 
+    /* 모달 공통 */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+    .modal {
+      width: 100%;
+      max-width: 360px;
+      background: #020617;
+      border-radius: 16px;
+      padding: 16px 18px 18px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .modal-header h2 {
+      font-size: 16px;
+    }
+    .modal-close {
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 1;
+    }
+    .field {
+      margin-bottom: 10px;
+    }
+    .field label {
+      display: block;
+      font-size: 11px;
+      margin-bottom: 4px;
+      color: #e5e7eb;
+    }
+    .field input {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #4b5563;
+      background: #020617;
+      color: #f9fafb;
+      font-size: 13px;
+    }
+    .primary-btn {
+      width: 100%;
+      padding: 10px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(90deg, #6366f1, #ec4899);
+      color: #f9fafb;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+    .muted {
+      font-size: 11px;
+      margin-top: 6px;
+      text-align: center;
+      color: #9ca3af;
+      cursor: pointer;
+    }
+    .error-text {
+      font-size: 11px;
+      color: #f97373;
+      min-height: 14px;
+    }
+
     /* 전체메뉴 사이드 드로어 */
     .side-menu-backdrop {
       position: fixed;
@@ -219,17 +338,28 @@
   </style>
 </head>
 <body>
-  <div class="main-container pb-24">
-    <header class="header">
-        <div class="user-info">
-          <span id="userNameText">...</span>님
-          <button id="logoutBtn" class="logout-btn">로그아웃</button>
-        </div>
-        <div class="user-info">
-          머니: <span id="moneyText">0</span> | 포인트: <span id="pointText">0</span>
-        </div>
-    </header>
+  <!-- 상단바 -->
+  <header class="top-bar">
+    <div class="logo">
+      <div class="logo-icon">SSS</div>
+      <div>SSS CASINO</div>
+    </div>
+    <div class="user-info">
+      <div id="balanceInfo" style="display: none;">
+        머니 : <span id="moneyText">0</span>원
+        &nbsp; 포인트 : <span id="pointText">0</span>원
+        &nbsp; 쪽지 : <span id="msgCountText">0</span>통
+      </div>
+      <div class="user-name-row">
+        <span id="userNameText">로그인이 필요합니다</span>
+        <button id="adminBtn" class="admin-btn">관리자페이지</button>
+        <button id="registerBtn" class="login-btn">회원가입</button>
+        <button id="loginToggleBtn" class="login-btn">로그인</button>
+      </div>
+    </div>
+  </header>
 
+  <div class="main-content-area">
     <div class="form-section">
       <div class="field">
         <label for="amount">환전 금액</label>
@@ -277,6 +407,7 @@
     </table>
   </div>
 
+  <!-- 하단 네비게이션 (id 추가해서 클릭 제어) -->
   <nav class="bottom-nav">
     <a href="index.html" class="bottom-item">
       <div class="bottom-icon">
@@ -355,26 +486,131 @@
     </div>
   </div>
 
+  <!-- 로그인/회원가입 모달 -->
+  <div id="authModalBackdrop" class="modal-backdrop">
+    <div class="modal" id="loginModal">
+      <div class="modal-header">
+        <h2 id="modalTitle">로그인</h2>
+        <div id="modalClose" class="modal-close">&times;</div>
+      </div>
+      <div id="loginFormContainer">
+        <div class="field">
+          <label for="loginEmail">아이디 또는 이메일</label>
+          <input id="loginEmail" type="text" autocomplete="username" placeholder="아이디 또는 이메일" />
+        </div>
+        <div class="field">
+          <label for="loginPassword">비밀번호</label>
+          <input id="loginPassword" type="password" autocomplete="current-password" />
+        </div>
+        <div class="error-text" id="loginError"></div>
+        <button class="primary-btn" id="loginSubmit">로그인</button>
+        <div class="muted" id="switchToRegister">회원가입 하러가기</div>
+      </div>
+
+      <div id="registerFormContainer" style="display:none;">
+        <div class="field">
+          <label for="regEmail">아이디 또는 이메일</label>
+          <input id="regEmail" type="text" autocomplete="username" placeholder="아이디 또는 이메일" />
+        </div>
+        <div class="field">
+          <label for="regPassword">비밀번호</label>
+          <input id="regPassword" type="password" autocomplete="new-password" />
+        </div>
+        <div class="field">
+          <label for="regNickname">닉네임</label>
+          <input id="regNickname" type="text" />
+        </div>
+        <div class="field">
+          <label for="regPhone">연락처 (선택)</label>
+          <input id="regPhone" type="tel" />
+        </div>
+        <div class="error-text" id="regError"></div>
+        <button class="primary-btn" id="regSubmit">회원가입</button>
+        <div class="muted" id="switchToLogin">이미 계정이 있어요</div>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import { auth, db } from "./js/firebase-config.js";
-    import { addDoc, collection, query, where, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-    import { listenAuth, logoutUser, fetchCurrentUserProfile } from "./js/auth-utils.js";
+    import { addDoc, collection, query, where, orderBy, onSnapshot, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    import { listenAuth, logoutUser, fetchCurrentUserProfile, loginUser, registerUser, translateAuthError } from "./js/auth-utils.js";
 
     const moneyText = document.getElementById("moneyText");
     const pointText = document.getElementById("pointText");
+    const msgCountText = document.getElementById("msgCountText");
     const userNameText = document.getElementById("userNameText");
-    const logoutBtn = document.getElementById("logoutBtn");
+    // const logoutBtn = document.getElementById("logoutBtn"); // Replaced by loginToggleBtn
+
     const amountInput = document.getElementById("amount");
     const bankNameInput = document.getElementById("bankName");
     const accountNumberInput = document.getElementById("accountNumber");
     const accountHolderInput = document.getElementById("accountHolder");
     const historyBody = document.getElementById("historyBody");
+    
+    // Header elements from index.html
+    const loginToggleBtn = document.getElementById("loginToggleBtn");
+    const adminBtn = document.getElementById("adminBtn");
+    const balanceInfo = document.getElementById("balanceInfo");
+    const registerBtn = document.getElementById("registerBtn");
 
+    // Auth Modal elements from index.html
+    const authModalBackdrop = document.getElementById("authModalBackdrop");
+    const modalClose = document.getElementById("modalClose");
+    const loginFormContainer = document.getElementById("loginFormContainer");
+    const registerFormContainer = document.getElementById("registerFormContainer");
+    const modalTitle = document.getElementById("modalTitle");
+    const loginEmail = document.getElementById("loginEmail");
+    const loginPassword = document.getElementById("loginPassword");
+    const loginSubmit = document.getElementById("loginSubmit");
+    const loginError = document.getElementById("loginError");
+    const regEmail = document.getElementById("regEmail");
+    const regPassword = document.getElementById("regPassword");
+    const regNickname = document.getElementById("regNickname");
+    const regPhone = document.getElementById("regPhone");
+    const regSubmit = document.getElementById("regSubmit");
+    const regError = document.getElementById("regError");
+    const switchToRegister = document.getElementById("switchToRegister");
+    const switchToLogin = document.getElementById("switchToLogin");
+
+    // Side Menu elements
     const sideMenuBackdrop = document.getElementById("sideMenuBackdrop");
     const sideMenuClose = document.getElementById("sideMenuClose");
     const openDrawerBtn = document.getElementById("openDrawerBtn");
     
+    // Nav links for guarding
+    const navDeposit = document.getElementById("navDeposit");
+    const navExchange = document.getElementById("navExchange");
+    const navMessages = document.getElementById("navMessages");
+
     let currentUserId = null;
+
+    // 아이디만 입력해도 이메일로 변환
+    function normalizeEmail(email) {
+      const trimmed = email.trim();
+      if (!trimmed) return trimmed;
+      if (trimmed.includes("@")) return trimmed;
+      return trimmed + "@casino.com";
+    }
+
+    function openModal(mode = "login") {
+      authModalBackdrop.style.display = "flex";
+      if (mode === "login") {
+        modalTitle.textContent = "로그인";
+        loginFormContainer.style.display = "block";
+        registerFormContainer.style.display = "none";
+      } else {
+        modalTitle.textContent = "회원가입";
+        loginFormContainer.style.display = "none";
+        registerFormContainer.style.display = "block";
+      }
+      loginError.textContent = "";
+      regError.textContent = "";
+    }
+
+    function closeModal() {
+      authModalBackdrop.style.display = "none";
+    }
 
     // 사이드 메뉴
     function openSideMenu() {
@@ -390,27 +626,152 @@
       if (e.target === sideMenuBackdrop) closeSideMenuFn();
     });
 
-    listenAuth(async (user) => {
-      if (!user) {
-        window.location.href = "index.html";
-        return;
+    // 로그인/로그아웃 토글
+    loginToggleBtn.addEventListener("click", () => {
+      if (auth.currentUser) {
+        if (confirm("로그아웃 하시겠습니까?")) {
+          logoutUser();
+        }
+      } else {
+        openModal("login");
       }
-      currentUserId = user.uid;
-      const profile = await fetchCurrentUserProfile(user.uid);
-      userNameText.textContent = profile?.nickname || user.email;
-      moneyText.textContent = (profile?.money ?? 0).toLocaleString();
-      pointText.textContent = (profile?.point ?? 0).toLocaleString();
-      
-      // Pre-fill account info if available
-      if (profile.bank) bankNameInput.value = profile.bank;
-      if (profile.account) accountNumberInput.value = profile.account;
-      if (profile.accountName) accountHolderInput.value = profile.accountName;
-      
-      loadWithdrawalHistory(user.uid);
     });
 
-    logoutBtn.addEventListener("click", () => {
-      logoutUser().then(() => window.location.href = "index.html");
+    // 회원가입 버튼
+    registerBtn.addEventListener("click", () => {
+      openModal("register");
+    });
+
+    // 관리자페이지 버튼
+    adminBtn.addEventListener("click", () => {
+      window.location.href = "admin.html";
+    });
+
+    switchToRegister.addEventListener("click", () => openModal("register"));
+    switchToLogin.addEventListener("click", () => openModal("login"));
+    modalClose.addEventListener("click", closeModal);
+    authModalBackdrop.addEventListener("click", (e) => {
+      if (e.target === authModalBackdrop) closeModal();
+    });
+
+    // 로그인
+    loginSubmit.addEventListener("click", async () => {
+      loginError.textContent = "";
+      let emailInput = loginEmail.value.trim();
+      const password = loginPassword.value;
+
+      if (!emailInput || !password) {
+        loginError.textContent = "아이디와 비밀번호를 모두 입력하세요.";
+        return;
+      }
+      const email = normalizeEmail(emailInput);
+
+      try {
+        await loginUser(email, password);
+        closeModal();
+      } catch (err) {
+        console.log("Firebase login error:", err.code, err.message);
+        loginError.textContent = translateAuthError(err);
+      }
+    });
+
+    // 회원가입
+    regSubmit.addEventListener("click", async () => {
+      regError.textContent = "";
+      let emailInput = regEmail.value.trim();
+      const password = regPassword.value;
+      const nickname = regNickname.value.trim();
+      const phone = regPhone.value.trim();
+
+      if (!emailInput || !password || !nickname) {
+        regError.textContent = "필수 항목을 모두 입력해주세요.";
+        return;
+      }
+      const email = normalizeEmail(emailInput);
+
+      try {
+        await registerUser({
+          email,
+          password,
+          nickname,
+          phone
+        });
+        alert("회원가입이 완료되었습니다. 자동으로 로그인됩니다.");
+        closeModal();
+      } catch (err) {
+        console.log("Firebase register error:", err.code, err.message);
+        regError.textContent = translateAuthError(err);
+      }
+    });
+
+    // 쪽지 개수
+    async function fetchUnreadMessageCount(uid) {
+      const q = query(
+        collection(db, "messages"),
+        where("toUserId", "==", uid),
+        where("isRead", "==", false)
+      );
+      const snap = await getDocs(q);
+      return snap.size;
+    }
+
+    // ★★ nav 클릭 시 로그인 안 되어 있으면 이동 막고 로그인 모달 띄우기
+    function guardNavLink(anchor, targetPageName) {
+      if (!anchor) return;
+      anchor.addEventListener("click", (e) => {
+        if (!auth.currentUser) {
+          e.preventDefault();
+          alert(targetPageName + "은(는) 로그인 후 이용 가능합니다.");
+          openModal("login");
+        }
+      });
+    }
+    guardNavLink(navDeposit, "충전");
+    guardNavLink(navExchange, "환전");
+    guardNavLink(navMessages, "쪽지함");
+
+    listenAuth(async (user) => {
+      if (!user) {
+        userNameText.textContent = "로그인이 필요합니다";
+        balanceInfo.style.display = "none";
+        loginToggleBtn.textContent = "로그인";
+        registerBtn.style.display = "inline-block";
+        adminBtn.style.display = "none";
+        currentUserId = null;
+        return;
+      }
+      balanceInfo.style.display = "block";
+      loginToggleBtn.textContent = "로그아웃";
+      registerBtn.style.display = "none";
+
+      try {
+        currentUserId = user.uid;
+        const profile = await fetchCurrentUserProfile(user.uid);
+        const nickname = profile?.nickname || user.email;
+        userNameText.textContent = nickname + "님";
+
+        const money = profile?.money ?? 0;
+        const point = profile?.point ?? 0;
+        moneyText.textContent = money.toLocaleString();
+        pointText.textContent = point.toLocaleString();
+
+        const isAdmin = profile?.role === "admin" || profile?.isAdmin === true;
+        adminBtn.style.display = isAdmin ? "inline-block" : "none";
+      } catch (err) {
+        console.error("profile load error:", err);
+        userNameText.textContent = (user.email || "알 수 없는 유저") + "님";
+        adminBtn.style.display = "none";
+      }
+
+      try {
+        const unread = await fetchUnreadMessageCount(user.uid);
+        msgCountText.textContent = String(unread);
+      } catch (err) {
+        console.error("message count error:", err);
+        msgCountText.textContent = "0";
+      }
+      
+      loadWithdrawalHistory(user.uid);
     });
     
     document.querySelector('.quick-buttons').addEventListener('click', (e) => {
@@ -437,6 +798,12 @@
       }
       if (!bank || !account || !accountName) {
         alert("은행명, 계좌번호, 예금주를 모두 입력해주세요.");
+        return;
+      }
+
+      if (!currentUserId) { // Ensure user is logged in before submitting
+        alert("로그인이 필요합니다.");
+        openModal("login");
         return;
       }
 
