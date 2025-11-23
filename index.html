@@ -1142,7 +1142,7 @@
         if (isFail) {
           card.classList.add("loading");
           setTimeout(() => {
-            alert("게임연동에 실패했습니다.");
+            alert("게임연동에 실패했습니다. 관리자에게 문의해주세요. API Error - play : 사용하지 않는 계정입니다.");
             card.classList.remove("loading");
           }, 2000);
           return;
