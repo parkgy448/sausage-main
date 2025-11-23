@@ -86,37 +86,23 @@
 
     /* 히어로 카드 */
     .hero-card {
+      position: relative;
       margin: 0 8px 16px;
-      border-radius: 18px;
-      padding: 16px;
-      background: linear-gradient(90deg, #f97316, #ec4899);
-      display: flex;
-      align-items: center;
-      gap: 16px;
+      border-radius: 0;
+      overflow: hidden;
+      min-height: 180px;
       box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
-    .hero-avatar {
-      width: 70px;
-      height: 70px;
-      border-radius: 999px;
-      background: radial-gradient(circle at 20% 20%, #facc15, #ea580c);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      font-weight: 700;
-      color: #111827;
-      text-align: center;
+    .hero-card:hover {
+      transform: translateY(-3px) scale(1.01);
+      box-shadow: 0 22px 44px rgba(0, 0, 0, 0.7);
     }
-    .hero-text-title {
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing: 1px;
-    }
-    .hero-text-sub {
-      font-size: 12px;
-      margin-top: 2px;
-      opacity: 0.9;
+    .hero-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
 
     /* 메인 탭 */
@@ -456,6 +442,81 @@
       }
     }
   </style>
+  <style>
+    /* Theme defaults (updated from banner colors at runtime) */
+    :root {
+      --theme-bg-start: #1f1208;
+      --theme-bg-mid: #0f0906;
+      --theme-bg-end: #050302;
+      --theme-surface: #120a05;
+      --theme-accent: #ff7a1a;
+      --theme-accent-strong: #ff9f1c;
+      --theme-icon-start: #ffbf69;
+      --theme-icon-end: #ff7a1a;
+      --theme-card-glow: rgba(255, 122, 26, 0.25);
+    }
+
+    body {
+      color: #fdf4e3;
+      background: radial-gradient(circle at 20% 15%, var(--theme-bg-start) 0, var(--theme-bg-mid) 55%, var(--theme-bg-end) 100%);
+    }
+    .top-bar {
+      background: var(--theme-surface);
+      border-bottom: 1px solid rgba(255, 191, 105, 0.14);
+    }
+    .logo-icon {
+      background: radial-gradient(circle at 20% 20%, var(--theme-accent), var(--theme-accent-strong));
+      color: #111827;
+    }
+    .login-btn {
+      background: linear-gradient(90deg, var(--theme-accent), var(--theme-accent-strong));
+      color: #111827;
+    }
+    .admin-btn {
+      background: var(--theme-accent);
+      color: #111827;
+    }
+    .main-tab.active {
+      color: var(--theme-accent);
+      border-bottom-color: var(--theme-accent);
+    }
+    .provider-card {
+      background: radial-gradient(circle at 20% 20%, var(--theme-accent-strong), var(--theme-bg-mid));
+      box-shadow: 0 10px 30px var(--theme-card-glow);
+    }
+    .provider-card::before {
+      background: radial-gradient(circle at top left, var(--theme-accent), transparent 55%);
+    }
+    .provider-icon {
+      background: linear-gradient(135deg, var(--theme-icon-start), var(--theme-icon-end));
+    }
+    .bottom-nav {
+      background: var(--theme-bg-mid);
+      border-top: 1px solid rgba(255, 191, 105, 0.14);
+    }
+    .bottom-item.active {
+      color: var(--theme-accent);
+    }
+    .primary-btn {
+      background: linear-gradient(90deg, var(--theme-accent), var(--theme-accent-strong));
+      color: #111827;
+    }
+    .side-menu-panel,
+    .modal {
+      background: var(--theme-surface);
+    }
+    .side-menu-logo-icon {
+      background: radial-gradient(circle at 20% 20%, var(--theme-accent), var(--theme-accent-strong));
+    }
+    .modal,
+    .field input {
+      border-color: rgba(255, 191, 105, 0.15);
+      color: #fdf4e3;
+    }
+    .main-tab small {
+      color: rgba(253, 244, 227, 0.7);
+    }
+  </style>
 </script>
 </head>
 <body>
@@ -484,11 +545,7 @@
   <main class="main">
     <!-- 메인 히어로 카드 -->
     <section class="hero-card">
-      <div class="hero-avatar">SSS<br/>캐릭터</div>
-      <div>
-        <div class="hero-text-title">SSS CASINO</div>
-        <div class="hero-text-sub">라이브 카지노 & 슬롯머신</div>
-      </div>
+      <img src="banner.jpg" alt="메인 배너 이미지">
     </section>
 
     <!-- 메인 탭 -->
