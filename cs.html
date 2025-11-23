@@ -19,15 +19,18 @@
 
     .top-bar {
       background: #050814;
-      padding: 10px 16px;
+      padding: 18px 12px 22px;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
+      gap: 10px;
       border-bottom: 1px solid rgba(148, 163, 184, 0.2);
     }
     .logo {
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
       font-weight: 700;
       font-size: 18px;
@@ -44,36 +47,78 @@
       font-weight: 800;
       color: #111827;
     }
+    .logo-img {
+      height: 56px;
+      width: auto;
+      display: block;
+    }
     .user-info {
-      text-align: right;
+      text-align: center;
       font-size: 12px;
       line-height: 1.4;
-    }
-    .user-name-row {
       display: flex;
-      align-items: center;
-      gap: 8px;
-      justify-content: flex-end;
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+      gap: 4px;
+    }
+.user-name-row {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  gap: 6px;
+  padding: 0 8px;
+  margin: 0;
+  flex-wrap: nowrap;
+  box-sizing: border-box;
+}
+    #balanceInfo {
+      order: 2;
     }
     .login-btn {
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: none;
-      background: #6366f1;
-      color: #f9fafb;
-      font-size: 12px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: linear-gradient(135deg, #f97316 0%, #fb923c 45%, #f59e0b 100%);
+      color: #fff;
+      font-size: 14px;
       cursor: pointer;
+      flex: 1 1 0;
+      min-width: 0;
+      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 700;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
     }
     .admin-btn {
-      padding: 4px 10px;
-      border-radius: 999px;
+      padding: 12px 12px;
+      border-radius: 14px;
       border: none;
       background: #f97316;
       color: #111827;
-      font-size: 12px;
+      font-size: 14px;
       cursor: pointer;
+      flex: 1 1 0;
+      min-width: 0;
+      text-align: center;
       display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 700;
     }
+.user-name-row .login-btn,
+.user-name-row .admin-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  white-space: nowrap;
+}
+.btn-icon {
+  display: none;
+}
 
     .main-content {
       flex: 1;
@@ -337,8 +382,8 @@
     }
     .login-btn,
     .primary-btn {
-      background: linear-gradient(90deg, var(--theme-accent), var(--theme-accent-strong)) !important;
-      color: #111827 !important;
+      background: linear-gradient(135deg, #f97316, #fb923c, #f59e0b) !important;
+      color: #ffffff !important;
     }
     .admin-btn {
       background: var(--theme-accent) !important;
@@ -401,20 +446,20 @@
 <body>
 <header class="top-bar">
   <div class="logo">
-    <div class="logo-icon">SSS</div>
-    <div>SSS CASINO</div>
+    <img class="logo-img" src="logo.png" alt="SSS CASINO 로고">
   </div>
   <div class="user-info">
     <div id="balanceInfo" style="display: none;">
       머니 : <span id="moneyText">0</span>원
-      &nbsp; 포인트 : <span id="pointText">0</span>점
-      &nbsp; 쪽지 : <span id="msgCountText">0</span>개
+      &nbsp; 포인트 : <span id="pointText">0</span>원
+      &nbsp; 쪽지 : <span id="msgCountText">0</span>통
     </div>
     <div class="user-name-row">
-      <span id="userNameText">로그인이 필요합니다</span>
-      <button id="adminBtn" class="admin-btn">관리자 페이지</button>
-      <button id="registerBtn" class="login-btn">회원가입</button>
+      <span id="userNameText"></span>
       <button id="loginToggleBtn" class="login-btn">로그인</button>
+      <button id="registerBtn" class="login-btn">회원가입</button>
+      <button id="guestBtn" class="login-btn">무기명가입</button>
+      <button id="adminBtn" class="admin-btn">관리자페이지</button>
     </div>
   </div>
 </header>
@@ -588,6 +633,7 @@
   const adminBtn = document.getElementById("adminBtn");
   const balanceInfo = document.getElementById("balanceInfo");
   const registerBtn = document.getElementById("registerBtn");
+  const guestBtn = document.getElementById("guestBtn");
 
   const authModalBackdrop = document.getElementById("authModalBackdrop");
   const modalClose = document.getElementById("modalClose");
@@ -651,10 +697,11 @@
         </div>
       `;
       newInquiryBtn.style.display = 'none';
-      userNameText.textContent = "로그인이 필요합니다";
+      userNameText.textContent = "";
       balanceInfo.style.display = "none";
       loginToggleBtn.textContent = "로그인";
       registerBtn.style.display = "inline-block";
+      if (guestBtn) guestBtn.style.display = "inline-block";
       adminBtn.style.display = "none";
       return;
     }
@@ -664,6 +711,7 @@
     balanceInfo.style.display = "block";
     loginToggleBtn.textContent = "로그아웃";
     registerBtn.style.display = "none";
+    if (guestBtn) guestBtn.style.display = "none";
 
     try {
       const profile = await fetchCurrentUserProfile(user.uid);
@@ -756,6 +804,7 @@
     }
   });
   registerBtn.addEventListener("click", () => openModal("register"));
+  if (guestBtn) guestBtn.addEventListener("click", () => openModal("register"));
   adminBtn.addEventListener("click", () => { window.location.href = "admin.html"; });
   switchToRegister.addEventListener("click", () => openModal("register"));
   switchToLogin.addEventListener("click", () => openModal("login"));

@@ -19,15 +19,18 @@
     /* 상단바 */
     .top-bar {
       background: #050814;
-      padding: 10px 16px;
+      padding: 18px 12px 22px;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
+      gap: 10px;
       border-bottom: 1px solid rgba(148, 163, 184, 0.2);
     }
     .logo {
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
       font-weight: 700;
       font-size: 18px;
@@ -45,52 +48,93 @@
       color: #111827;
     }
     .user-info {
-      text-align: right;
+      text-align: center;
       font-size: 12px;
       line-height: 1.4;
-    }
-    .user-name-row {
       display: flex;
-      align-items: center;
-      gap: 8px;
-      justify-content: flex-end;
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+      gap: 4px;
+    }
+.user-name-row {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  gap: 6px;
+  padding: 0 8px;
+  margin: 0;
+  flex-wrap: nowrap;
+  box-sizing: border-box;
+}
+
+    #balanceInfo {
+      order: 2;
     }
     .login-btn {
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: none;
-      background: #6366f1;
-      color: #f9fafb;
-      font-size: 12px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: linear-gradient(135deg, #f97316 0%, #fb923c 45%, #f59e0b 100%);
+      color: #fff;
+      font-size: 14px;
       cursor: pointer;
+      flex: 1 1 0;
+      min-width: 0;
+      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 700;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
     }
     .admin-btn {
-      padding: 4px 10px;
-      border-radius: 999px;
+      padding: 12px 12px;
+      border-radius: 14px;
       border: none;
       background: #f97316;
       color: #111827;
-      font-size: 12px;
+      font-size: 14px;
       cursor: pointer;
+      flex: 1 1 0;
+      min-width: 0;
+      text-align: center;
       display: none; /* 기본 숨김 */
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 700;
     }
+
+.user-name-row .login-btn,
+.user-name-row .admin-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 12px 12px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 12px;
+  white-space: nowrap;
+}
 
     /* 메인 영역 */
     .main {
       flex: 1;
-      padding: 12px 8px 60px;
-      max-width: 640px;
-      margin: 0 auto;
+      padding: 12px 12px 80px;
       width: 100%;
     }
 
     /* 히어로 카드 */
     .hero-card {
       position: relative;
-      margin: 0 8px 16px;
+      margin: 0 8px 4px;
       border-radius: 0;
       overflow: hidden;
-      min-height: 180px;
+      height: clamp(140px, 22vw, 200px);
+      min-height: 140px;
       box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
       transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
@@ -99,6 +143,8 @@
       box-shadow: 0 22px 44px rgba(0, 0, 0, 0.7);
     }
     .hero-card img {
+      position: absolute;
+      inset: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -132,9 +178,9 @@
     /* 게임 카드 */
     .card-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
       gap: 12px;
-      padding: 0 8px;
+      padding: 0 4px;
     }
     .provider-card {
       position: relative;
@@ -180,8 +226,6 @@
       bottom: 0;
       left: 0;
       right: 0;
-      max-width: 640px;
-      margin: 0 auto;
       display: flex;
       background: #020617;
       border-top: 1px solid rgba(148, 163, 184, 0.3);
@@ -459,13 +503,40 @@
       background: radial-gradient(circle at 20% 20%, var(--theme-accent), var(--theme-accent-strong));
       color: #111827;
     }
+    .logo-img {
+      height: 56px;
+      width: auto;
+      display: block;
+    }
     .login-btn {
-      background: linear-gradient(90deg, var(--theme-accent), var(--theme-accent-strong));
-      color: #111827;
+      background: linear-gradient(135deg, #f97316 0%, #fb923c 45%, #f59e0b 100%);
+      color: #fff;
+      border-radius: 14px;
+      padding: 12px 12px;
+      font-size: 14px;
+      flex: 1 1 0;
+      min-width: 0;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
     }
     .admin-btn {
       background: var(--theme-accent);
       color: #111827;
+      border-radius: 14px;
+      padding: 12px 12px;
+      font-size: 14px;
+      flex: 1 1 0;
+      min-width: 0;
+      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 700;
+    }
+    .btn-icon {
+      display: none;
     }
     .main-tab.active {
       color: var(--theme-accent);
@@ -485,9 +556,7 @@
     .provider-label-en {
       text-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
     }
-    .provider-icon {
-      background: linear-gradient(135deg, var(--theme-icon-start), var(--theme-icon-end));
-    }
+    .provider-icon { display: none; }
     /* Provider-specific backgrounds (set URLs to your image paths) */
     .bg-evo {
       background-image:
@@ -542,8 +611,7 @@
   <!-- 상단바 -->
   <header class="top-bar">
     <div class="logo">
-      <div class="logo-icon">SSS</div>
-      <div>SSS CASINO</div>
+      <img class="logo-img" src="logo.png" alt="SSS CASINO 로고">
     </div>
     <div class="user-info">
       <div id="balanceInfo" style="display: none;">
@@ -552,10 +620,20 @@
         &nbsp; 쪽지 : <span id="msgCountText">0</span>통
       </div>
       <div class="user-name-row">
-        <span id="userNameText">로그인이 필요합니다</span>
+        <span id="userNameText"></span>
+        <button id="loginToggleBtn" class="login-btn">
+          <span aria-hidden="true" class="btn-icon">🔒</span>
+          <span>로그인</span>
+        </button>
+        <button id="registerBtn" class="login-btn">
+          <span aria-hidden="true" class="btn-icon">➕</span>
+          <span>회원가입</span>
+        </button>
+        <button id="guestBtn" class="login-btn">
+          <span aria-hidden="true" class="btn-icon">⚡</span>
+          <span>무기명가입</span>
+        </button>
         <button id="adminBtn" class="admin-btn">관리자페이지</button>
-        <button id="registerBtn" class="login-btn">회원가입</button>
-        <button id="loginToggleBtn" class="login-btn">로그인</button>
       </div>
     </div>
   </header>
@@ -1045,16 +1123,20 @@
     // 인증 상태
     listenAuth(async (user) => {
       if (!user) {
-        userNameText.textContent = "로그인이 필요합니다";
+        userNameText.textContent = "";
         balanceInfo.style.display = "none";
-        loginToggleBtn.textContent = "로그인";
-        registerBtn.style.display = "inline-block"; // Show register button when logged out
-        adminBtn.style.display = "none";
-        return;
-      }
+      loginToggleBtn.textContent = "로그인";
+      registerBtn.style.display = "inline-block"; // Show register button when logged out
+      const guestBtn = document.getElementById("guestBtn");
+      if (guestBtn) guestBtn.style.display = "inline-block";
+      adminBtn.style.display = "none";
+      return;
+    }
       balanceInfo.style.display = "block";
       loginToggleBtn.textContent = "로그아웃";
       registerBtn.style.display = "none"; // Hide register button when logged in
+      const guestBtn = document.getElementById("guestBtn");
+      if (guestBtn) guestBtn.style.display = "none";
 
       try {
         const profile = await fetchCurrentUserProfile(user.uid);
