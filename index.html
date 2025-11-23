@@ -196,6 +196,10 @@
       cursor: pointer;
       transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
     }
+    .provider-card.loading {
+      opacity: 0.75;
+      pointer-events: none;
+    }
     .provider-card::before {
       content: "";
       position: absolute;
@@ -235,6 +239,25 @@
       margin-top: 6px;
     }
     #slotTab .provider-label-en {
+      font-size: 9px;
+      margin-top: -2px;
+    }
+    /* 카지노 탭도 스포츠 탭처럼 가로형 카드 4개를 세로로 배치 */
+    #liveTab .provider-card {
+      aspect-ratio: 16 / 6;
+      min-height: 140px;
+      background-size: cover !important;
+      background-position: center center !important;
+    }
+    #liveTab.card-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    #liveTab .provider-label-ko {
+      font-size: 12px;
+      margin-top: 6px;
+    }
+    #liveTab .provider-label-en {
       font-size: 9px;
       margin-top: -2px;
     }
@@ -678,25 +701,25 @@
 
     <!-- 라이브 카지노 카드들 -->
     <section id="liveTab" class="card-grid">
-      <div class="provider-card" data-url="roulette.html" data-bg="https://i.ibb.co/0pHxVcxh/photo-2025-11-23-12-22-11.jpg">
+      <div class="provider-card" data-url="https://babylonvg.evo-games.com/entry?params=Y2FzaW5vX2lkPWJhYnlsb252ZzAwMDAwMDEKc2lnbmF0dXJlPTBCbzhINHhCQkR6cGx5NDlnWldKbUtKNWJUVFd2MFc2NldLYTVkakVMZGFDdHNyVFNWZHJJUW12OUJWOHlBdFBoTDA4MHAwNGtlTjJlOE96ZVctRGJ3CnVhX2xhdW5jaF9pZD0xODZmZTFmYmJmNzgzZjkzMWI2NmY3NDEKc2l0ZT0xMApqd3NoPWV5SnJhV1FpT2lJeE56TTVORFE0TkRBeE56azFJaXdpWVd4bklqb2lSVk15TlRZaWZRCnBsYXlfbW9kZT1yZWFsX21vbmV5CmNhdGVnb3J5PWJhY2NhcmF0X3NpY2JvCg&JSESSIONID=tbst5r4juv7q3efath6exty4bs4yrlhc2d9573d1" data-bg="https://i.ibb.co/B2XvKMbD/EVO.jpg">
         <div class="provider-icon"></div>
         <div class="provider-label-ko">에볼루션</div>
         <div class="provider-label-en">Evolution Gaming</div>
       </div>
-      <div class="provider-card" data-url="#" data-bg="https://i.ibb.co/0pHxVcxh/photo-2025-11-23-12-22-11.jpg">
+      <div class="provider-card" data-url="https://hj1au6t5xe.lnaeyrfjti.net/gs2c/playGame.do?key=token%3D208f801db2c44772a45bd74b09a49b78%60%7C%60symbol%3D101%60%7C%60technology%3DH5%60%7C%60platform%3DWEB%60%7C%60language%3Dko%60%7C%60currency%3DKRW%60%7C%60cashierUrl%3Dhttp%3A%2F%2Fout_public.enjoycx.com%2Fexit%60%7C%60lobbyUrl%3Dhttp%3A%2F%2Fout_public.enjoycx.com%2Fexit&ppkv=2&stylename=veda_swix&country=KR&ctlgroup=veda_E&isGameUrlApiCalled=true" data-bg="https://i.ibb.co/3y27zS7d/PP.jpg">
         <div class="provider-icon"></div>
         <div class="provider-label-ko">프라그마틱라이브</div>
         <div class="provider-label-en">Pragmatic Play</div>
       </div>
-      <div class="provider-card" data-url="#" data-bg="https://i.ibb.co/0pHxVcxh/photo-2025-11-23-12-22-11.jpg">
+      <div class="provider-card" data-url="#" data-fail="true" data-bg="https://i.ibb.co/TBhsXVyq/SEXY.jpg">
         <div class="provider-icon"></div>
-        <div class="provider-label-ko">아시아게이밍</div>
-        <div class="provider-label-en">Asia Gaming</div>
+        <div class="provider-label-ko">SEXY 라이브</div>
+        <div class="provider-label-en">SEXY LIVE</div>
       </div>
-      <div class="provider-card" data-url="#" data-bg="https://i.ibb.co/0pHxVcxh/photo-2025-11-23-12-22-11.jpg">
+      <div class="provider-card" data-url="#" data-fail="true" data-bg="https://i.ibb.co/FbYP9gcW/EZUGI.jpg">
         <div class="provider-icon"></div>
-        <div class="provider-label-ko">마이크로게이밍</div>
-        <div class="provider-label-en">Microgaming</div>
+        <div class="provider-label-ko">EZUGI 라이브</div>
+        <div class="provider-label-en">EZUGI LIVE</div>
       </div>
     </section>
 
@@ -1108,13 +1131,24 @@
     document.querySelectorAll(".provider-card").forEach(card => {
       card.addEventListener("click", () => {
         const url = card.dataset.url;
-        if (!url || url === "#") return;
+        const isFail = card.dataset.fail === "true";
 
         if (!auth.currentUser) {
           alert("로그인이 필요한 서비스입니다.");
           openModal("login");
           return;
         }
+
+        if (isFail) {
+          card.classList.add("loading");
+          setTimeout(() => {
+            alert("게임연동에 실패했습니다.");
+            card.classList.remove("loading");
+          }, 2000);
+          return;
+        }
+
+        if (!url || url === "#") return;
         window.location.href = url;
       });
     });

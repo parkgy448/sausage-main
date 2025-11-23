@@ -4,64 +4,32 @@
   <meta charset="UTF-8" />
   <title>공지사항 - SSS CASINO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    :root {
-        --color-bg: #020617;
-        --color-bg-light: #0f172a;
-        --color-bg-lighter: #1e293b;
-        --color-border: #334155;
-        --color-text: #f9fafb;
-        --color-text-dim: #9ca3af;
-        --color-primary: #f97316;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--color-text);
+      color: #f9fafb;
+      min-height: 100vh;
       background: radial-gradient(circle at top, #1f2937 0, #020617 55%, #000000 100%);
+      display: flex;
+      flex-direction: column;
     }
-    .accordion-item {
-        background-color: var(--color-bg-light);
-        border: 1px solid var(--color-border);
-        border-radius: 8px;
-    }
-    .accordion-header {
-        padding: 16px;
-        cursor: pointer;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .accordion-body {
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.3s ease-out, padding 0.3s ease-out;
-        padding: 0 16px;
-        font-size: 14px;
-        line-height: 1.7;
-        color: var(--color-text-dim);
-    }
-    .accordion-item.open .accordion-body {
-        max-height: 1000px; /* 충분히 큰 값 */
-        padding: 0 16px 16px;
-    }
-    .accordion-icon {
-        transition: transform 0.3s ease;
-    }
-    .accordion-item.open .accordion-icon {
-        transform: rotate(180deg);
-    }
+    a { color: inherit; text-decoration: none; }
+
     .top-bar {
       background: #050814;
-      padding: 10px 16px;
+      padding: 18px 12px 22px;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
+      gap: 10px;
       border-bottom: 1px solid rgba(148, 163, 184, 0.2);
     }
     .logo {
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
       font-weight: 700;
       font-size: 18px;
@@ -78,35 +46,136 @@
       font-weight: 800;
       color: #111827;
     }
+    .logo-img {
+      height: 56px;
+      width: auto;
+      display: block;
+    }
     .user-info {
-      text-align: right;
+      text-align: center;
       font-size: 12px;
       line-height: 1.4;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+      gap: 4px;
     }
     .user-name-row {
       display: flex;
-      align-items: center;
-      gap: 8px;
-      justify-content: flex-end;
+      width: 100%;
+      max-width: 100%;
+      gap: 6px;
+      padding: 0 8px;
+      margin: 0;
+      flex-wrap: nowrap;
+      box-sizing: border-box;
     }
+    #balanceInfo { order: 2; }
     .login-btn {
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: none;
-      background: #6366f1;
-      color: #f9fafb;
-      font-size: 12px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: linear-gradient(135deg, #f97316 0%, #fb923c 45%, #f59e0b 100%);
+      color: #fff;
+      font-size: 14px;
       cursor: pointer;
+      flex: 1 1 0;
+      min-width: 0;
+      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 700;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
     }
     .admin-btn {
-      padding: 4px 10px;
-      border-radius: 999px;
+      padding: 12px 12px;
+      border-radius: 14px;
       border: none;
       background: #f97316;
       color: #111827;
-      font-size: 12px;
+      font-size: 14px;
       cursor: pointer;
-      display: none; /* 기본 숨김 */
+      flex: 1 1 0;
+      min-width: 0;
+      text-align: center;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 700;
+    }
+    .btn-icon { display: none; }
+
+    .main-content-area {
+      flex: 1;
+      padding: 16px;
+      padding-bottom: 96px;
+      width: 100%;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    .page-header {
+      margin-bottom: 16px;
+    }
+    .page-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #f97316;
+      margin-bottom: 6px;
+    }
+    .page-desc {
+      font-size: 13px;
+      color: #cbd5e1;
+    }
+
+    .message-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .message-item {
+      background-color: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+    }
+    .message-item:hover { border-color: rgba(249, 115, 22, 0.6); }
+    .message-item .unread-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #f97316;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .message-item .msg-content { flex-grow: 1; }
+    .message-item .msg-title {
+      font-weight: 700;
+      font-size: 15px;
+      color: #f8fafc;
+    }
+    .message-item .msg-time {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+    .message-item .chevron {
+      color: #94a3b8;
+      font-size: 18px;
+      padding-left: 6px;
+    }
+    .empty-state {
+      color: #94a3b8;
+      text-align: center;
+      padding: 28px 12px;
+      font-size: 14px;
     }
 
     .bottom-nav {
@@ -119,6 +188,8 @@
       display: flex;
       background: #020617;
       border-top: 1px solid rgba(148, 163, 184, 0.3);
+      font-size: 11px;
+      color: #9ca3af;
       z-index: 40;
     }
     .bottom-item {
@@ -136,20 +207,242 @@
       cursor: pointer;
       text-decoration: none;
     }
-    .bottom-icon svg {
-      width: 22px;
-      height: 22px;
-    }
-    .bottom-label { margin-top: 1px; }
+    .bottom-icon { display: flex; align-items: center; justify-content: center; }
+    .bottom-icon svg { width: 22px; height: 22px; display: block; }
+    .bottom-label { margin-top: 1px; line-height: 1.2; }
     .bottom-item.active { color: #f97316; }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+    .modal {
+      width: 100%;
+      max-width: 360px;
+      background: #020617;
+      border-radius: 16px;
+      padding: 16px 18px 18px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+      border: 1px solid rgba(255, 191, 105, 0.15);
+      color: #f9fafb;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .modal-header h2 { font-size: 16px; }
+    .modal-close {
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 1;
+    }
+    .modal-time {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-bottom: 10px;
+    }
+    .modal-body {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #cbd5e1;
+      white-space: pre-wrap;
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+    .field { margin-bottom: 10px; }
+    .field label {
+      display: block;
+      font-size: 11px;
+      margin-bottom: 4px;
+      color: #e5e7eb;
+    }
+    .field input {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #4b5563;
+      background: #020617;
+      color: #f9fafb;
+      font-size: 13px;
+    }
+    .primary-btn {
+      width: 100%;
+      padding: 10px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(90deg, #6366f1, #ec4899);
+      color: #f9fafb;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+    .muted {
+      font-size: 11px;
+      margin-top: 6px;
+      text-align: center;
+      color: #9ca3af;
+      cursor: pointer;
+    }
+    .error-text {
+      font-size: 11px;
+      color: #f97373;
+      min-height: 14px;
+    }
+
+    .side-menu-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.75);
+      display: flex;
+      align-items: stretch;
+      justify-content: flex-start;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease-out;
+      z-index: 60;
+    }
+    .side-menu-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .side-menu-panel {
+      width: 280px;
+      max-width: 80%;
+      background: #050814;
+      padding: 16px 18px;
+      transform: translateX(-100%);
+      transition: transform 0.18s ease-out;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid rgba(255, 191, 105, 0.14);
+    }
+    .side-menu-backdrop.open .side-menu-panel {
+      transform: translateX(0);
+      box-shadow: 0 0 40px rgba(0,0,0,0.5);
+    }
+    .side-menu-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .side-menu-header-logo { display: flex; align-items: center; gap: 8px; }
+    .side-menu-logo-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 20% 20%, #facc15, #ea580c);
+    }
+    .side-menu-title-text { font-size: 14px; color: #e5e7eb; }
+    .side-menu-close {
+      background: none;
+      border: none;
+      color: #e5e7eb;
+      font-size: 22px;
+      cursor: pointer;
+    }
+    .side-menu-caption {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-bottom: 18px;
+    }
+    .side-menu-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .side-menu-list a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      color: #cbd5e1;
+      text-decoration: none;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+    .side-menu-list a:hover {
+      background-color: rgba(249, 115, 22, 0.1);
+      color: #f97316;
+    }
+
+    :root {
+      --theme-bg-start: #1f1208;
+      --theme-bg-mid: #0f0906;
+      --theme-bg-end: #050302;
+      --theme-surface: #120a05;
+      --theme-surface-strong: #1a0d06;
+      --theme-accent: #ff7a1a;
+      --theme-accent-strong: #ff9f1c;
+      --theme-muted: rgba(253, 244, 227, 0.7);
+      --theme-stroke: rgba(255, 191, 105, 0.16);
+      --theme-card-glow: rgba(255, 122, 26, 0.18);
+      --theme-text: #fdf4e3;
+    }
+    body {
+      color: var(--theme-text);
+      background: radial-gradient(circle at 20% 15%, var(--theme-bg-start) 0, var(--theme-bg-mid) 55%, var(--theme-bg-end) 100%) !important;
+    }
+    .top-bar {
+      background: var(--theme-surface) !important;
+      border-bottom: 1px solid var(--theme-stroke) !important;
+    }
+    .logo-icon {
+      background: radial-gradient(circle at 20% 20%, var(--theme-accent), var(--theme-accent-strong)) !important;
+      color: #111827 !important;
+    }
+    .login-btn,
+    .primary-btn {
+      background: linear-gradient(135deg, #f97316, #fb923c, #f59e0b) !important;
+      color: #ffffff !important;
+    }
+    .admin-btn {
+      background: var(--theme-accent) !important;
+      color: #111827 !important;
+    }
+    .message-item {
+      background: var(--theme-surface) !important;
+      border: 1px solid var(--theme-stroke) !important;
+      box-shadow: 0 10px 24px var(--theme-card-glow);
+    }
+    .message-item .unread-dot { background: var(--theme-accent) !important; }
+    .message-item .msg-time { color: var(--theme-muted) !important; }
+    .bottom-nav {
+      background: var(--theme-bg-mid) !important;
+      border-top: 1px solid var(--theme-stroke) !important;
+    }
+    .bottom-item.active { color: var(--theme-accent) !important; }
+    .modal,
+    .side-menu-panel {
+      background: var(--theme-surface) !important;
+      border: 1px solid var(--theme-stroke) !important;
+    }
+    .field input {
+      background: var(--theme-surface-strong) !important;
+      border: 1px solid var(--theme-stroke) !important;
+      color: var(--theme-text) !important;
+      box-shadow: inset 0 0 0 1px rgba(255, 122, 26, 0.08);
+    }
+    .side-menu-logo-icon {
+      background: radial-gradient(circle at 20% 20%, var(--theme-accent), var(--theme-accent-strong)) !important;
+    }
   </style>
 </head>
-<body class="min-h-screen">
-
+<body>
   <header class="top-bar">
     <div class="logo">
-      <div class="logo-icon">SSS</div>
-      <div>SSS CASINO</div>
+      <img class="logo-img" src="https://i.ibb.co/5XdcFLFJ/logo.png" alt="SSS CASINO 로고">
     </div>
     <div class="user-info">
       <div id="balanceInfo" style="display: none;">
@@ -158,102 +451,488 @@
         &nbsp; 쪽지 : <span id="msgCountText">0</span>통
       </div>
       <div class="user-name-row">
-        <span id="userNameText">로그인이 필요합니다</span>
+        <span id="userNameText"></span>
+        <button id="loginToggleBtn" class="login-btn">
+          <span aria-hidden="true" class="btn-icon">🔒</span>
+          <span>로그인</span>
+        </button>
+        <button id="registerBtn" class="login-btn">
+          <span aria-hidden="true" class="btn-icon">🧑</span>
+          <span>회원가입</span>
+        </button>
+        <button id="guestBtn" class="login-btn">
+          <span aria-hidden="true" class="btn-icon">⭐</span>
+          <span>무기명가입</span>
+        </button>
         <button id="adminBtn" class="admin-btn">관리자페이지</button>
-        <button id="registerBtn" class="login-btn">회원가입</button>
-        <button id="loginToggleBtn" class="login-btn">로그인</button>
       </div>
     </div>
   </header>
 
-  <main class="p-4 pb-24 max-w-4xl mx-auto w-full">
-    <h1 class="text-2xl font-bold text-orange-400 mb-6">공지사항</h1>
-    <div id="accordionContainer" class="space-y-3">
-      <!-- 공지사항 아이템들이 여기에 동적으로 추가됩니다. -->
+  <main class="main-content-area">
+    <div class="page-header">
+      <div class="page-title">공지사항</div>
+      <div class="page-desc">관리자가 등록한 최신 공지사항을 확인하세요.</div>
     </div>
+    <div id="contentList" class="message-list"></div>
   </main>
 
   <nav class="bottom-nav">
     <a href="index.html" class="bottom-item">
       <div class="bottom-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5"></path><path d="M6 10v8.5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V10"></path></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 10.5 12 4l8 6.5"></path>
+          <path d="M6 10v8.5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V10"></path>
+        </svg>
       </div>
       <div class="bottom-label">홈</div>
     </a>
     <a href="deposit.html" id="navDeposit" class="bottom-item">
-      <div class="bottom-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="7" rx="7" ry="3.5"></ellipse><path d="M5 7v5c0 1.9 3.1 3.5 7 3.5s7-1.6 7-3.5V7"></path><path d="M5 12v3.5C5 17.4 8.1 19 12 19s7-1.6 7-3.5V12"></path></svg></div>
+      <div class="bottom-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <ellipse cx="12" cy="7" rx="7" ry="3.5"></ellipse>
+          <path d="M5 7v5c0 1.9 3.1 3.5 7 3.5s7-1.6 7-3.5V7"></path>
+          <path d="M5 12v3.5C5 17.4 8.1 19 12 19s7-1.6 7-3.5V12"></path>
+        </svg>
+      </div>
       <div class="bottom-label">충전신청</div>
     </a>
     <button type="button" class="bottom-item" id="openDrawerBtn">
-      <div class="bottom-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg></div>
+      <div class="bottom-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M4 7h16"></path>
+          <path d="M4 12h16"></path>
+          <path d="M4 17h16"></path>
+        </svg>
+      </div>
       <div class="bottom-label">전체메뉴</div>
     </button>
     <a href="exchange.html" id="navExchange" class="bottom-item">
-      <div class="bottom-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="10" rx="2"></rect><path d="M8 12h5"></path><path d="M13 10 15 12l-2 2"></path></svg></div>
+      <div class="bottom-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="7" width="18" height="10" rx="2"></rect>
+          <path d="M8 12h5"></path>
+          <path d="M13 10 15 12l-2 2"></path>
+        </svg>
+      </div>
       <div class="bottom-label">환전신청</div>
     </a>
     <a href="messages.html" id="navMessages" class="bottom-item">
-      <div class="bottom-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.2" y="6" width="17.6" height="12" rx="1.8"></rect><path d="M4.5 7.5 12 12.5l7.5-5"></path></svg></div>
+      <div class="bottom-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3.2" y="6" width="17.6" height="12" rx="1.8"></rect>
+          <path d="M4.5 7.5 12 12.5l7.5-5"></path>
+        </svg>
+      </div>
       <div class="bottom-label">쪽지</div>
+    </a>
+    <a href="cs.html" class="bottom-item">
+      <div class="bottom-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+        </svg>
+      </div>
+      <div class="bottom-label">고객센터</div>
     </a>
   </nav>
 
+  <div id="sideMenuBackdrop" class="side-menu-backdrop">
+    <div class="side-menu-panel">
+      <div class="side-menu-header">
+        <div class="side-menu-header-logo">
+          <div class="side-menu-logo-icon"></div>
+          <div>
+            <div>SSS CASINO</div>
+            <div class="side-menu-title-text">전체메뉴</div>
+          </div>
+        </div>
+        <button id="sideMenuClose" class="side-menu-close">&times;</button>
+      </div>
+      <div class="side-menu-caption">원하는 메뉴를 선택하세요.</div>
+      <ul class="side-menu-list">
+        <li><a href="index.html">라이브카지노</a></li>
+        <li><a href="roulette.html">슬롯게임</a></li>
+        <li><a href="deposit.html">충전신청</a></li>
+        <li><a href="exchange.html">환전신청</a></li>
+        <li><a href="transfer.html">포인트 전환</a></li>
+        <li><a href="notice.html">공지사항</a></li>
+        <li><a href="event.html">이벤트</a></li>
+        <li><a href="cs.html">고객센터</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="authModalBackdrop" class="modal-backdrop">
+    <div class="modal" id="loginModal">
+      <div class="modal-header">
+        <h2 id="modalTitle">로그인</h2>
+        <div id="modalClose" class="modal-close">&times;</div>
+      </div>
+      <div id="loginFormContainer">
+        <div class="field">
+          <label for="loginEmail">아이디 또는 이메일</label>
+          <input id="loginEmail" type="text" autocomplete="username" placeholder="아이디 또는 이메일" />
+        </div>
+        <div class="field">
+          <label for="loginPassword">비밀번호</label>
+          <input id="loginPassword" type="password" autocomplete="current-password" placeholder="비밀번호 입력" />
+        </div>
+        <div class="error-text" id="loginError"></div>
+        <button class="primary-btn" id="loginSubmit">로그인</button>
+        <div class="muted" id="switchToRegister">회원가입 하러가기</div>
+      </div>
+
+      <div id="registerFormContainer" style="display:none;">
+        <div class="field">
+          <label for="regId">아이디</label>
+          <input id="regId" type="text" placeholder="아이디" />
+        </div>
+        <div class="field">
+          <label for="regNickname">닉네임</label>
+          <input id="regNickname" type="text" placeholder="닉네임" />
+        </div>
+        <div class="field">
+          <label for="regPassword">비밀번호</label>
+          <input id="regPassword" type="password" autocomplete="new-password" placeholder="비밀번호 입력" />
+        </div>
+        <div class="field">
+          <label for="regBank">은행</label>
+          <input id="regBank" type="text" placeholder="은행" />
+        </div>
+        <div class="field">
+          <label for="regAccountNumber">계좌번호</label>
+          <input id="regAccountNumber" type="text" placeholder="계좌번호" />
+        </div>
+        <div class="field">
+          <label for="regAccountHolder">예금주</label>
+          <input id="regAccountHolder" type="text" placeholder="예금주" />
+        </div>
+        <div class="field">
+          <label for="regWithdrawPassword">출금비번</label>
+          <input id="regWithdrawPassword" type="password" placeholder="숫자 4자리" autocomplete="new-password" />
+        </div>
+        <div class="field">
+          <label for="regPhone">휴대폰 번호</label>
+          <input id="regPhone" type="tel" placeholder="휴대폰 번호" />
+        </div>
+        <div class="error-text" id="regError"></div>
+        <button class="primary-btn" id="regSubmit">회원가입</button>
+        <div class="muted" id="switchToLogin">이미 계정이 있어요</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="contentDetailModal" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="contentDetailTitle">공지사항</h2>
+        <div id="contentDetailClose" class="modal-close">&times;</div>
+      </div>
+      <div id="contentDetailTime" class="modal-time"></div>
+      <div id="contentDetailBody" class="modal-body"></div>
+    </div>
+  </div>
+
   <script type="module">
     import { auth, db } from "./js/firebase-config.js";
-    import { collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-    import { listenAuth, updateUIForUser, updateUIForGuest } from "./js/auth-utils.js";
+    import {
+      collection,
+      query,
+      where,
+      orderBy,
+      onSnapshot,
+      getDocs
+    } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    import {
+      loginUser,
+      registerUser,
+      logoutUser,
+      listenAuth,
+      fetchCurrentUserProfile,
+      translateAuthError
+    } from "./js/auth-utils.js";
 
-    // --- Authentication ---
-    listenAuth((user, profile) => {
-      if (user && profile) {
-        updateUIForUser(user, profile);
+    const PAGE = {
+      title: "공지사항",
+      collection: "announcements",
+      emptyText: "등록된 공지사항이 없습니다."
+    };
+
+    const moneyText = document.getElementById("moneyText");
+    const pointText = document.getElementById("pointText");
+    const msgCountText = document.getElementById("msgCountText");
+    const userNameText = document.getElementById("userNameText");
+    const loginToggleBtn = document.getElementById("loginToggleBtn");
+    const adminBtn = document.getElementById("adminBtn");
+    const balanceInfo = document.getElementById("balanceInfo");
+    const registerBtn = document.getElementById("registerBtn");
+    const guestBtn = document.getElementById("guestBtn");
+
+    const authModalBackdrop = document.getElementById("authModalBackdrop");
+    const modalClose = document.getElementById("modalClose");
+    const loginFormContainer = document.getElementById("loginFormContainer");
+    const registerFormContainer = document.getElementById("registerFormContainer");
+    const modalTitle = document.getElementById("modalTitle");
+
+    const loginEmail = document.getElementById("loginEmail");
+    const loginPassword = document.getElementById("loginPassword");
+    const loginSubmit = document.getElementById("loginSubmit");
+    const loginError = document.getElementById("loginError");
+
+    const regId = document.getElementById("regId");
+    const regPassword = document.getElementById("regPassword");
+    const regNickname = document.getElementById("regNickname");
+    const regBank = document.getElementById("regBank");
+    const regAccountNumber = document.getElementById("regAccountNumber");
+    const regAccountHolder = document.getElementById("regAccountHolder");
+    const regWithdrawPassword = document.getElementById("regWithdrawPassword");
+    const regPhone = document.getElementById("regPhone");
+    const regSubmit = document.getElementById("regSubmit");
+    const regError = document.getElementById("regError");
+
+    const switchToRegister = document.getElementById("switchToRegister");
+    const switchToLogin = document.getElementById("switchToLogin");
+
+    const sideMenuBackdrop = document.getElementById("sideMenuBackdrop");
+    const sideMenuClose = document.getElementById("sideMenuClose");
+    const openDrawerBtn = document.getElementById("openDrawerBtn");
+
+    const navDeposit = document.getElementById("navDeposit");
+    const navExchange = document.getElementById("navExchange");
+    const navMessages = document.getElementById("navMessages");
+
+    const contentList = document.getElementById("contentList");
+    const detailModal = document.getElementById("contentDetailModal");
+    const detailTitle = document.getElementById("contentDetailTitle");
+    const detailBody = document.getElementById("contentDetailBody");
+    const detailTime = document.getElementById("contentDetailTime");
+    const detailClose = document.getElementById("contentDetailClose");
+
+    function normalizeEmail(email) {
+      const trimmed = email.trim();
+      if (!trimmed) return trimmed;
+      if (trimmed.includes("@")) return trimmed;
+      return trimmed + "@casino.com";
+    }
+
+    function openModal(mode = "login") {
+      authModalBackdrop.style.display = "flex";
+      if (mode === "login") {
+        modalTitle.textContent = "로그인";
+        loginFormContainer.style.display = "block";
+        registerFormContainer.style.display = "none";
       } else {
-        updateUIForGuest();
+        modalTitle.textContent = "회원가입";
+        loginFormContainer.style.display = "none";
+        registerFormContainer.style.display = "block";
+      }
+      loginError.textContent = "";
+      regError.textContent = "";
+    }
+    function closeModal() { authModalBackdrop.style.display = "none"; }
+
+    function openSideMenu() { sideMenuBackdrop.classList.add("open"); }
+    function closeSideMenuFn() { sideMenuBackdrop.classList.remove("open"); }
+
+    openDrawerBtn?.addEventListener("click", openSideMenu);
+    sideMenuClose?.addEventListener("click", closeSideMenuFn);
+    sideMenuBackdrop?.addEventListener("click", (e) => {
+      if (e.target === sideMenuBackdrop) closeSideMenuFn();
+    });
+
+    loginToggleBtn?.addEventListener("click", () => {
+      if (auth.currentUser) {
+        if (confirm("로그아웃 하시겠습니까?")) logoutUser();
+      } else {
+        openModal("login");
+      }
+    });
+    registerBtn?.addEventListener("click", () => openModal("register"));
+    guestBtn?.addEventListener("click", () => openModal("register"));
+    adminBtn?.addEventListener("click", () => { window.location.href = "admin.html"; });
+
+    switchToRegister?.addEventListener("click", () => openModal("register"));
+    switchToLogin?.addEventListener("click", () => openModal("login"));
+    modalClose?.addEventListener("click", closeModal);
+    authModalBackdrop?.addEventListener("click", (e) => {
+      if (e.target === authModalBackdrop) closeModal();
+    });
+
+    loginSubmit?.addEventListener("click", async () => {
+      loginError.textContent = "";
+      const emailInput = loginEmail.value.trim();
+      const password = loginPassword.value;
+      if (!emailInput || !password) {
+        loginError.textContent = "아이디와 비밀번호를 모두 입력하세요.";
+        return;
+      }
+      const email = normalizeEmail(emailInput);
+      try {
+        await loginUser(email, password);
+        closeModal();
+      } catch (err) {
+        loginError.textContent = translateAuthError(err);
       }
     });
 
-    const accordionContainer = document.getElementById('accordionContainer');
+    regSubmit?.addEventListener("click", async () => {
+      regError.textContent = "";
+      const idInput = regId.value.trim();
+      const password = regPassword.value;
+      const nickname = regNickname.value.trim();
+      const bank = regBank.value.trim();
+      const accountNumber = regAccountNumber.value.trim();
+      const accountHolder = regAccountHolder.value.trim();
+      const withdrawPassword = regWithdrawPassword.value.trim();
+      const phone = regPhone.value.trim();
 
-    const q = query(collection(db, "announcements"), where("active", "==", true), orderBy("createdAt", "desc"));
-    
-    onSnapshot(q, (snapshot) => {
-        if (snapshot.empty) {
-            accordionContainer.innerHTML = '<p class="text-center text-gray-500">등록된 공지사항이 없습니다.</p>';
-            return;
-        }
-        
-        let html = '';
-        snapshot.forEach(doc => {
-            const item = doc.data();
-            const date = item.createdAt?.toDate?.().toLocaleDateString('ko-KR') || '';
-            html += `
-                <div class="accordion-item">
-                    <div class="accordion-header">
-                        <div>
-                            <div class="font-semibold">${item.title}</div>
-                            <div class="text-xs text-gray-400 mt-1">${date}</div>
-                        </div>
-                        <div class="accordion-icon">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </div>
-                    </div>
-                    <div class="accordion-body">
-                        <div class="prose prose-invert max-w-none">${item.body.replace(/\n/g, '<br>')}</div>
-                    </div>
-                </div>
-            `;
+      if (!idInput || !password || !nickname || !bank || !accountNumber || !accountHolder || !withdrawPassword) {
+        regError.textContent = "필수 항목을 모두 입력해주세요.";
+        return;
+      }
+      if (withdrawPassword.length !== 4 || !/^\d+$/.test(withdrawPassword)) {
+        regError.textContent = "출금비번은 숫자 4자리여야 합니다.";
+        return;
+      }
+
+      const email = normalizeEmail(idInput);
+      try {
+        await registerUser({
+          email,
+          password,
+          nickname,
+          bank,
+          accountNumber,
+          accountHolder,
+          withdrawPassword,
+          phone
         });
-        accordionContainer.innerHTML = html;
+        alert("회원가입이 완료되었습니다. 자동으로 로그인됩니다.");
+        alert("관리자 승인 후 모든 서비스를 이용할 수 있습니다.");
+        closeModal();
+      } catch (err) {
+        regError.textContent = translateAuthError(err);
+      }
     });
 
-    accordionContainer.addEventListener('click', (e) => {
-        const header = e.target.closest('.accordion-header');
-        if (header) {
-            const item = header.parentElement;
-            item.classList.toggle('open');
+    function guardNavLink(anchor, targetName) {
+      if (!anchor) return;
+      anchor.addEventListener("click", (e) => {
+        if (!auth.currentUser) {
+          e.preventDefault();
+          alert(`${targetName}은(는) 로그인 후 이용 가능합니다.`);
+          openModal("login");
         }
+      });
+    }
+    guardNavLink(navDeposit, "충전");
+    guardNavLink(navExchange, "환전");
+    guardNavLink(navMessages, "쪽지함");
+
+    async function fetchUnreadMessageCount(uid) {
+      const q = query(collection(db, "userMessages", uid, "messages"), where("read", "==", false));
+      const snap = await getDocs(q);
+      return snap.size;
+    }
+
+    listenAuth(async (user) => {
+      if (!user) {
+        userNameText.textContent = "";
+        balanceInfo.style.display = "none";
+        loginToggleBtn.textContent = "로그인";
+        registerBtn.style.display = "inline-block";
+        if (guestBtn) guestBtn.style.display = "inline-block";
+        adminBtn.style.display = "none";
+        msgCountText.textContent = "0";
+        return;
+      }
+
+      balanceInfo.style.display = "block";
+      loginToggleBtn.textContent = "로그아웃";
+      registerBtn.style.display = "none";
+      if (guestBtn) guestBtn.style.display = "none";
+
+      try {
+        const profile = await fetchCurrentUserProfile(user.uid);
+        if (profile && profile.status === "pending") {
+          alert("관리자의 가입 승인을 기다리는 중입니다. 자동으로 로그아웃됩니다.");
+          logoutUser();
+          return;
+        }
+
+        const nickname = profile?.nickname || user.email;
+        userNameText.textContent = `${nickname}님`;
+        moneyText.textContent = (profile?.money ?? 0).toLocaleString();
+        pointText.textContent = (profile?.point ?? 0).toLocaleString();
+        const isAdmin = profile?.role === "admin" || profile?.isAdmin === true;
+        adminBtn.style.display = isAdmin ? "inline-block" : "none";
+      } catch (err) {
+        console.error("profile load error:", err);
+        userNameText.textContent = (user.email || "알 수 없는 유저") + "님";
+        adminBtn.style.display = "none";
+      }
+
+      try {
+        const unread = await fetchUnreadMessageCount(user.uid);
+        msgCountText.textContent = String(unread);
+      } catch (err) {
+        console.error("message count error:", err);
+        msgCountText.textContent = "0";
+      }
+    });
+
+    function renderEmpty() {
+      contentList.innerHTML = `<p class="empty-state">${PAGE.emptyText}</p>`;
+    }
+
+    function openDetail(item) {
+      detailTitle.textContent = item.title || PAGE.title;
+      detailTime.textContent = item.date || "";
+      detailBody.textContent = item.body || "";
+      detailModal.style.display = "flex";
+    }
+
+    detailClose?.addEventListener("click", () => detailModal.style.display = "none");
+    detailModal?.addEventListener("click", (e) => {
+      if (e.target === detailModal) detailModal.style.display = "none";
+    });
+
+    const contentQuery = query(
+      collection(db, PAGE.collection),
+      where("active", "==", true),
+      orderBy("createdAt", "desc")
+    );
+
+    onSnapshot(contentQuery, (snapshot) => {
+      if (snapshot.empty) {
+        renderEmpty();
+        return;
+      }
+      contentList.innerHTML = "";
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const createdAt = data?.createdAt?.toDate?.()?.toLocaleString("ko-KR") || "";
+        const item = document.createElement("div");
+        item.className = "message-item";
+        item.innerHTML = `
+          <div class="unread-dot"></div>
+          <div class="msg-content">
+            <div class="msg-title">${data?.title || PAGE.title}</div>
+            <div class="msg-time">${createdAt}</div>
+          </div>
+          <div class="chevron">&rsaquo;</div>
+        `;
+        item.addEventListener("click", () => openDetail({
+          title: data?.title,
+          body: data?.body,
+          date: createdAt
+        }));
+        contentList.appendChild(item);
+      });
+    }, (err) => {
+      console.error("공지사항 불러오기 오류:", err);
+      renderEmpty();
     });
   </script>
-
 </body>
 </html>
