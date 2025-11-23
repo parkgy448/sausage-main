@@ -446,7 +446,7 @@
 <body>
 <header class="top-bar">
   <div class="logo">
-    <img class="logo-img" src="logo.png" alt="SSS CASINO 로고">
+    <img class="logo-img" src="https://i.ibb.co/5XdcFLFJ/logo.png" alt="SSS CASINO 로고">
   </div>
   <div class="user-info">
     <div id="balanceInfo" style="display: none;">
@@ -804,6 +804,7 @@
     }
   });
   registerBtn.addEventListener("click", () => openModal("register"));
+  if (guestBtn) guestBtn.addEventListener("click", () => openModal("register"));
   if (guestBtn) guestBtn.addEventListener("click", () => openModal("register"));
   adminBtn.addEventListener("click", () => { window.location.href = "admin.html"; });
   switchToRegister.addEventListener("click", () => openModal("register"));
