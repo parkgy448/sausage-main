@@ -133,8 +133,8 @@
       margin: 0 8px 4px;
       border-radius: 0;
       overflow: hidden;
-      height: clamp(140px, 22vw, 200px);
-      min-height: 140px;
+      aspect-ratio: 25 / 9;
+      min-height: 100px;
       box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
       transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
@@ -219,6 +219,15 @@
       margin-top: 2px;
     }
     .provider-icon { display: none; }
+    /* 스포츠(슬롯 탭) 카드 전용 비율/높이 */
+    #slotTab .provider-card {
+      aspect-ratio: 16 / 8;
+      min-height: 180px;
+    }
+    #slotTab.card-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
 
     /* 하단 네비게이션 */
     .bottom-nav {
@@ -561,7 +570,7 @@
     .bg-evo {
       background-image:
         linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.65)),
-        url("https://i.ibb.co/0pHxVcxh/photo-2025-11-23-12-22-11.jpg");
+        url("images/evo.jpg");
     }
     .bg-pragmatic {
       background-image:
@@ -652,8 +661,8 @@
         <small>LIVE CASINO</small>
       </div>
       <div class="main-tab" data-tab="slot">
-        슬롯머신
-        <small>SLOT MACHINE</small>
+        스포츠
+        <small>SPORTS</small>
       </div>
     </section>
 
@@ -683,15 +692,20 @@
 
     <!-- 슬롯머신 탭 -->
     <section id="slotTab" class="card-grid" style="display:none;">
-      <div class="provider-card">
+      <div class="provider-card" data-url="https://prod20293.442hattrick.com" data-bg="https://i.ibb.co/4g395DMg/FB.jpg">
         <div class="provider-icon"></div>
-        <div class="provider-label-ko">슬롯 A</div>
-        <div class="provider-label-en">Slot Provider A</div>
+        <div class="provider-label-ko">FB 스포츠</div>
+        <div class="provider-label-en">FB SPORTS</div>
       </div>
-      <div class="provider-card">
+      <div class="provider-card" data-url="https://prod20293.442hattrick.com" data-bg="https://i.ibb.co/VYfyzY4q/CMD.jpg">
         <div class="provider-icon"></div>
-        <div class="provider-label-ko">슬롯 B</div>
-        <div class="provider-label-en">Slot Provider B</div>
+        <div class="provider-label-ko">CMD 스포츠</div>
+        <div class="provider-label-en">CMD SPORTS</div>
+      </div>
+      <div class="provider-card" data-url="https://prod20293.442hattrick.com" data-bg="https://i.ibb.co/VcM64Frg/SBO.jpg">
+        <div class="provider-icon"></div>
+        <div class="provider-label-ko">SBO 스포츠</div>
+        <div class="provider-label-en">SBO SPORTS</div>
       </div>
     </section>
   </main>
