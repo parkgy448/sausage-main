@@ -241,6 +241,90 @@
     }
     .error-text { font-size: 11px; color: #f97373; min-height: 14px; }
   </style>
+  <style>
+    :root {
+      --theme-bg-start: #1f1208;
+      --theme-bg-mid: #0f0906;
+      --theme-bg-end: #050302;
+      --theme-surface: #120a05;
+      --theme-surface-strong: #1a0d06;
+      --theme-accent: #ff7a1a;
+      --theme-accent-strong: #ff9f1c;
+      --theme-muted: rgba(253, 244, 227, 0.7);
+      --theme-stroke: rgba(255, 191, 105, 0.16);
+      --theme-card-glow: rgba(255, 122, 26, 0.18);
+      --theme-text: #fdf4e3;
+    }
+    body {
+      color: var(--theme-text);
+      background: radial-gradient(circle at 20% 15%, var(--theme-bg-start) 0, var(--theme-bg-mid) 55%, var(--theme-bg-end) 100%) !important;
+    }
+    .top-bar {
+      background: var(--theme-surface) !important;
+      border-bottom: 1px solid var(--theme-stroke) !important;
+    }
+    .logo-icon {
+      background: radial-gradient(circle at 20% 20%, var(--theme-accent), var(--theme-accent-strong)) !important;
+      color: #111827 !important;
+    }
+    .login-btn,
+    .primary-btn {
+      background: linear-gradient(90deg, var(--theme-accent), var(--theme-accent-strong)) !important;
+      color: #111827 !important;
+      box-shadow: 0 12px 28px var(--theme-card-glow);
+    }
+    .admin-btn {
+      background: var(--theme-accent) !important;
+      color: #111827 !important;
+    }
+    .back-btn {
+      background: var(--theme-surface) !important;
+      border: 1px solid var(--theme-stroke) !important;
+      color: var(--theme-text) !important;
+    }
+    .inquiry-detail {
+      background: var(--theme-surface) !important;
+      border: 1px solid var(--theme-stroke) !important;
+      box-shadow: 0 12px 28px var(--theme-card-glow);
+    }
+    .inquiry-status,
+    .reply-box {
+      background: var(--theme-accent) !important;
+      border: 1px solid var(--theme-stroke) !important;
+      color: #111827 !important;
+    }
+    .inquiry-status.answered {
+      background: var(--theme-accent-strong) !important;
+    }
+    .reply-title {
+      color: #111827 !important;
+    }
+    .reply-date,
+    .inquiry-meta {
+      color: var(--theme-muted) !important;
+    }
+    .bottom-nav {
+      background: var(--theme-bg-mid) !important;
+      border-top: 1px solid var(--theme-stroke) !important;
+    }
+    .bottom-item.active {
+      color: var(--theme-accent) !important;
+    }
+    .modal,
+    .side-menu-panel {
+      background: var(--theme-surface) !important;
+      border: 1px solid var(--theme-stroke) !important;
+    }
+    .field input {
+      background: var(--theme-surface-strong) !important;
+      border: 1px solid var(--theme-stroke) !important;
+      color: var(--theme-text) !important;
+      box-shadow: inset 0 0 0 1px rgba(255, 122, 26, 0.08);
+    }
+    .side-menu-logo-icon {
+      background: radial-gradient(circle at 20% 20%, var(--theme-accent), var(--theme-accent-strong)) !important;
+    }
+  </style>
 </head>
 
 <body>
