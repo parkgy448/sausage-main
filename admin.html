@@ -123,7 +123,7 @@
     <script type="module">
         import { auth, db } from "./js/firebase-config.js";
         import { listenAuth } from "./js/auth-utils.js";
-        import { collection, getDocs, getDoc, doc, updateDoc, deleteDoc, setDoc, writeBatch, serverTimestamp, query, where, orderBy, runTransaction, onSnapshot, addDoc, increment } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import { collection, getDocs, getDoc, doc, updateDoc, deleteDoc, setDoc, writeBatch, serverTimestamp, query, where, orderBy, runTransaction, onSnapshot, addDoc, increment, limit } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
         // --- DOM Elements ---
         const getEl = (id) => document.getElementById(id);
@@ -462,11 +462,12 @@
                 const messagesContainer = getEl('messagesContainer');
                 if(!messagesContainer) return;
                 renderTable('messagesContainer', snapshot.docs, doc => {
-                    const msg = doc.data();
+                    const msg = doc.data() || {};
+                    const text = (msg.text || '').replace(/\n/g, '<br>');
                     return `<div class="flex mb-2 ${msg.sender === 'admin' ? 'justify-end' : 'justify-start'}">
                         <div class="p-2 rounded-lg max-w-xs ${msg.sender === 'admin' ? 'bg-indigo-500' : 'bg-slate-600'}">
-                            ${msg.text.replace(/\n/g, '<br>')}
-                            <div class="text-xs text-right opacity-70 mt-1">${msg.timestamp?.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) || ''}</div>
+                            ${text}
+                            <div class="text-xs text-right opacity-70 mt-1">${msg.timestamp?.toDate?.().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) || ''}</div>
                         </div></div>`;
                 }, '');
                 if(messagesContainer) messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -482,6 +483,29 @@
 
             await addDoc(collection(db, "supportChats", userId, "messages"), { text, sender: 'admin', timestamp: serverTimestamp() });
             await updateDoc(doc(db, "supportChats", userId), { lastMessage: text, updatedAt: serverTimestamp(), unreadByUser: increment(1) });
+
+            // 최신 문의에도 답변 반영 (목록 상태 업데이트)
+            try {
+                const latestInquirySnap = await getDocs(
+                    query(
+                        collection(db, "userInquiries"),
+                        where("userId", "==", userId),
+                        orderBy("createdAt", "desc"),
+                        limit(1)
+                    )
+                );
+                if (!latestInquirySnap.empty) {
+                    const inquiryDoc = latestInquirySnap.docs[0].ref;
+                    await updateDoc(inquiryDoc, {
+                        adminReply: text,
+                        status: '답변 완료',
+                        repliedAt: serverTimestamp(),
+                        updatedAt: serverTimestamp()
+                    });
+                }
+            } catch (err) {
+                console.error("문의 상태 업데이트 실패:", err);
+            }
         }
 
         function setupContentManagement() {
