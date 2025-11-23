@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
@@ -676,6 +676,7 @@
 
   <script type="module">
     import { auth, db } from "./js/firebase-config.js";
+    import { EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
     import { addDoc, collection, query, where, orderBy, onSnapshot, serverTimestamp, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
     import { listenAuth, logoutUser, fetchCurrentUserProfile, loginUser, registerUser, translateAuthError } from "./js/auth-utils.js";
 
@@ -840,7 +841,6 @@
     guardNavLink(navMessages, "쪽지함");
 
     // 인증 상태 리스너 (메인 로직)
-        // ?? ?? ???(?? ??)
     listenAuth(async (user) => {
       if (!user) {
         userNameText.textContent = "";
@@ -851,6 +851,10 @@
         adminBtn.style.display = "none";
         currentUserId = null;
         currentUserProfile = null;
+        passwordCheckSection.classList.add("hidden");
+        depositAccountDisplay.classList.add("hidden");
+        accountPasswordCheck.value = "";
+        passwordCheckError.textContent = "";
         return;
       }
       
@@ -926,11 +930,14 @@
     contactAccountBtn.addEventListener('click', () => {
         if (!currentUserId) {
           alert("로그인이 필요합니다.");
+          openModal("login");
           return;
         }
-        const encodedTitle = encodeURIComponent("계좌문의");
-        const encodedContent = encodeURIComponent("계좌 문의 드립니다.");
-        window.location.href = `cs_write.html?title=${encodedTitle}&content=${encodedContent}&autoSubmit=1`;
+        passwordCheckSection.classList.remove("hidden");
+        depositAccountDisplay.classList.add("hidden");
+        passwordCheckError.textContent = "";
+        accountPasswordCheck.value = "";
+        accountPasswordCheck.focus();
     });
 
     verifyPasswordBtn.addEventListener('click', async () => {
@@ -939,12 +946,15 @@
             passwordCheckError.textContent = "비밀번호를 입력해주세요.";
             return;
         }
+        if (!auth.currentUser?.email) {
+            passwordCheckError.textContent = "로그인 후 이용해주세요.";
+            return;
+        }
         
         try {
-            // Re-authenticate to verify password
-            await loginUser(auth.currentUser.email, password);
+            const credential = EmailAuthProvider.credential(auth.currentUser.email, password);
+            await reauthenticateWithCredential(auth.currentUser, credential);
             
-            // On success, fetch and show account info
             const docSnap = await getDoc(doc(db, "config", "depositAccount"));
             if (docSnap.exists()) {
                 const { bank, number, holder } = docSnap.data();
