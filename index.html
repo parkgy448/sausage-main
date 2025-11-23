@@ -221,12 +221,22 @@
     .provider-icon { display: none; }
     /* 스포츠(슬롯 탭) 카드 전용 비율/높이 */
     #slotTab .provider-card {
-      aspect-ratio: 16 / 8;
-      min-height: 180px;
+      aspect-ratio: 16 / 6;
+      min-height: 140px;
+      background-size: cover !important;
+      background-position: center center !important;
     }
     #slotTab.card-grid {
       grid-template-columns: 1fr;
       gap: 10px;
+    }
+    #slotTab .provider-label-ko {
+      font-size: 12px;
+      margin-top: 6px;
+    }
+    #slotTab .provider-label-en {
+      font-size: 9px;
+      margin-top: -2px;
     }
 
     /* 하단 네비게이션 */
