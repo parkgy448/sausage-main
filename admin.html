@@ -149,10 +149,14 @@
         import { auth, db } from "./js/firebase-config.js";
         import { listenAuth } from "./js/auth-utils.js";
         import { collection, getDocs, getDoc, doc, updateDoc, deleteDoc, setDoc, writeBatch, serverTimestamp, query, where, orderBy, runTransaction, onSnapshot, addDoc, increment, limit } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-functions.js";
 
         // --- DOM Elements ---
         const getEl = (id) => document.getElementById(id);
         const adminPanel = getEl('adminPanel'), accessDenied = getEl('accessDenied'), loadingIndicator = getEl('loadingIndicator'), adminEmailEl = getEl('adminEmail');
+
+        const functions = getFunctions();
+        const deleteAuthUserFn = httpsCallable(functions, "deleteAuthUser");
         
         // --- Caches ---
         let allUsersCache = new Map();
@@ -288,6 +292,16 @@
             getEl("userInfoModal").classList.remove("hidden");
         }
 
+        async function deleteAuthAccount(uid) {
+            try {
+                await deleteAuthUserFn({ uid });
+            } catch (err) {
+                console.error("deleteAuthUser failed", err);
+                alert("Auth delete failed. Deploy Cloud Function deleteAuthUser.");
+                throw err;
+            }
+        }
+
         async function changePassword(uid) {
             const newPw = prompt("변경할 새 비밀번호를 입력하세요:");
             if (!newPw) return;
@@ -307,6 +321,7 @@
         async function deleteUser(uid) {
             if (!confirm("정말로 이 회원을 삭제하시겠습니까? 데이터는 복구되지 않습니다.")) return;
             await withLoading(async () => {
+                await deleteAuthAccount(uid);
                 await deleteDoc(doc(db, "users", uid));
                 allUsersCache.delete(uid);
                 await loadAllUsers();
@@ -414,6 +429,7 @@
                         await updateDoc(doc(db, "users", userId), { status: 'active' });
                         if(allUsersCache.has(userId)) allUsersCache.get(userId).status = 'active';
                     } else {
+                        await deleteAuthAccount(userId);
                         await deleteDoc(doc(db, "users", userId));
                         allUsersCache.delete(userId);
                     }

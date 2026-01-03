@@ -1076,6 +1076,8 @@
     const sideNavEvent = document.getElementById("sideNavEvent");
     const sideNavCs = document.getElementById("sideNavCs");
 
+    let suppressPendingNotice = false;
+
     // 아이디만 입력해도 이메일로 변환
     function normalizeEmail(email) {
       const trimmed = email.trim();
@@ -1201,11 +1203,17 @@
       };
 
       try {
+        suppressPendingNotice = true;
         await registerUser(userData);
-        alert("회원가입이 완료되었습니다. 자동으로 로그인됩니다.");
-        alert("관리자 승인 후 모든 서비스를 이용할 수 있습니다.");
+        alert("회원가입이 완료되었습니다.");
+        alert("관리자 승인 대기해주세요.");
+        await logoutUser();
+        suppressPendingNotice = false;
         closeModal();
+        window.location.href = "index.html";
       } catch (err) {
+        suppressPendingNotice = false;
+
         console.log("Firebase register error:", err.code, err.message);
         regError.textContent = translateAuthError(err);
       }
@@ -1322,8 +1330,11 @@
         const profile = await fetchCurrentUserProfile(user.uid);
         
         if (profile && profile.status === 'pending') {
-          alert("관리자의 가입 승인을 기다리는 중입니다. 자동으로 로그아웃됩니다.");
-          logoutUser();
+          if (suppressPendingNotice) return;
+          alert("로그인되었습니다.");
+          alert("관리자 승인 대기 중입니다.");
+          await logoutUser();
+          window.location.href = "index.html";
           return;
         }
 
